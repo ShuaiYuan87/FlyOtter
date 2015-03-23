@@ -7,7 +7,7 @@ var rid = Math.floor(Math.random() * UNIVERSE);
 var PlayerState = require('lib/player_state');
 var PlayerAction = require('lib/player_action');
 var msg = require('lib/msg');
-var socket = io.connect('http://localhost:8989');
+var socket = io.connect('http://67.161.30.248:8989');
 // tutorial1.js
 var Youku = React.createClass({
       mixins: [ReactScriptLoaderMixin],
@@ -35,7 +35,7 @@ var Youku = React.createClass({
       var player = new YKU.Player('youkuplayer',{
         styleid: '0',
         client_id: '716d2b2fc5573842',
-        vid: 'XOTA1MjgyMDYw',
+        vid: 'XODk5MTIyNjE2',
         events:{
           onPlayStart: function(){ document.getElementById("title").style.color = "red";playVideo();},
           onPlayerReady: function(){   document.getElementById("title").style.color = "red";playVideo();}
@@ -114,7 +114,7 @@ var Youku = React.createClass({
 
       // An object of options to indicate where to post to
     var post_options = {
-        host: 'localhost',
+        host: '67.161.30.248',
         port: '8989',
         method: 'POST',
         headers: {
