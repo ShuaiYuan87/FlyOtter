@@ -6,8 +6,14 @@ var UNIVERSE = 100000;
 var rid = Math.floor(Math.random() * UNIVERSE);
 var PlayerState = require('lib/player_state');
 var PlayerAction = require('lib/player_action');
+var Progress = require('react-progressbar');
 var msg = require('lib/msg');
-var socket = io.connect('http://67.161.30.248:8989');
+
+var serverIP = '67.161.30.248';
+//var serverIP = 'localhost';
+var port = '8989';
+
+var socket = io.connect('http://' + serverIP + ':' + port);
 // tutorial1.js
 var Youku = React.createClass({
       mixins: [ReactScriptLoaderMixin],
@@ -18,7 +24,8 @@ var Youku = React.createClass({
             scriptLoading: true,
             scriptLoadError: false,
             player: null,
-            'playerState': PlayerState.UNSTARTED
+            'playerState': PlayerState.UNSTARTED,
+            progress: 0
         };
     },
 
@@ -45,7 +52,21 @@ var Youku = React.createClass({
       this.setState({
         player: player
       });
+
+      this.interval = setInterval(this.tick, 1000);
     },
+
+  tick: function() {
+    if (!this.state.player) {
+      this.setState({
+        progress: 0
+      });
+     } else {
+       this.setState({
+         progress: (this.state.player.currentTime() / this.state.player.totalTime()) * 100
+       });
+     }
+  },
 
     // ReactScriptLoaderMixin calls this function when the script has failed to load.
     onScriptError: function() {
@@ -89,6 +110,20 @@ var Youku = React.createClass({
 
   },
 
+    _handleProgressChange: function(percent) {
+      debugger;
+        var player = this.state.player;
+        if (player) {
+            var time = percent * player.totalTime() / 100;
+            player.seekTo(time);
+            message = this.createMessage(false, rid, time, PlayerAction.SEEK); 
+            this.postData(message);
+        }
+        this.setState({
+            progress: percent,
+        });
+    },
+
   render: function() {
     var message;
     var input;
@@ -97,12 +132,13 @@ var Youku = React.createClass({
     } else if (this.state.scriptLoadError) {
         message = 'loading failed';
     } else {
-        message = 'loading succeeded';
+      message = 'loading succeeded';
       input =  <button onClick={this.pauseVideo}> Pause </button>;
       
     }
     return <div>
-    {input}
+       {input}
+       <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} />
        <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}> </div>
         <span>{message}</span>
     </div>;
@@ -114,8 +150,8 @@ var Youku = React.createClass({
 
       // An object of options to indicate where to post to
     var post_options = {
-        host: '67.161.30.248',
-        port: '8989',
+        host: serverIP,
+        port: port,
         method: 'POST',
         headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -161,7 +197,7 @@ var Youku = React.createClass({
     
     switch(data.msgType) {
     case msg.MsgType.CHECK_LATENCY:
-        notifyServer(createMessage(true, rid));
+        this.postData(createMessage(true, rid));
         break;
     case msg.MsgType.ACTION:
         this.applyActionToPlayer(data, this.state.player);
@@ -182,9 +218,10 @@ var Youku = React.createClass({
           this.state.playerState = PlayerState.PAUSED;
           this.state.player.pauseVideo();
           break;
-      //case PlayerAction.SEEK:
-          //player.seekTo(data.playerTime);
-          //break;
+      case PlayerAction.SEEK:
+        debugger;
+         this.state.player.seekTo(data.playerTime);
+         break;
       }
     }
   },
