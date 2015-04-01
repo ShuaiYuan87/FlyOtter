@@ -44,8 +44,8 @@ var Youku = React.createClass({
       client_id: '716d2b2fc5573842',
       vid: 'XODk5MTIyNjE2',
       events:{
-	onPlayStart: function(){ document.getElementById("title").style.color = "red";playVideo();},
-	onPlayerReady: function(){   document.getElementById("title").style.color = "red";playVideo();}
+        onPlayStart: function(){ document.getElementById("title").style.color = "red";playVideo();},
+        onPlayerReady: function(){   document.getElementById("title").style.color = "red";playVideo();}
       }
     });
 
@@ -59,11 +59,11 @@ var Youku = React.createClass({
   tick: function() {
     if (!this.state.player) {
       this.setState({
-	progress: 0
+        progress: 0
       });
     } else {
       this.setState({
-	progress: (this.state.player.currentTime() / this.state.player.totalTime()) * 100
+        progress: (this.state.player.currentTime() / this.state.player.totalTime()) * 100
       });
     }
   },
@@ -94,15 +94,15 @@ var Youku = React.createClass({
       case PlayerState.UNSTARTED:
       case PlayerState.ENDED:
       case PlayerState.PAUSED:
-	this.state.playerState = PlayerState.PLAYING;
-	this.state.player.playVideo();
-	message = this.createMessage(false, rid, 0, PlayerAction.PLAY); 
-	break;
+        this.state.playerState = PlayerState.PLAYING;
+        this.state.player.playVideo();
+        message = this.createMessage(false, rid, 0, PlayerAction.PLAY); 
+        break;
       default:
-	this.state.playerState = PlayerState.PAUSED;
-	this.state.player.pauseVideo();
-	message = this.createMessage(false, rid, 0, PlayerAction.PAUSE); 
-	break;
+        this.state.playerState = PlayerState.PAUSED;
+        this.state.player.pauseVideo();
+        message = this.createMessage(false, rid, 0, PlayerAction.PAUSE); 
+        break;
       }
       console.log(message);
       this.postData(message);
