@@ -111,7 +111,6 @@ var Youku = React.createClass({
   },
 
     _handleProgressChange: function(percent) {
-      debugger;
         var player = this.state.player;
         if (player) {
             var time = percent * player.totalTime() / 100;
