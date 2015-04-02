@@ -18,6 +18,7 @@ var socket = io.connect('http://' + serverIP + ':' + port);
 var Youku = React.createClass({
   mixins: [ReactScriptLoaderMixin],
   getInitialState: function() {
+    socket.emit('create', 'room1');
     socket.on('notification', this.messageRecieve);
 
     return {
@@ -105,7 +106,8 @@ var Youku = React.createClass({
         break;
       }
       console.log(message);
-      this.postData(message);
+      //this.postData(message);
+      socket.emit('postData', JSON.stringify(message));
     }
 
   },
@@ -116,7 +118,7 @@ var Youku = React.createClass({
       var time = percent * player.totalTime() / 100;
       player.seekTo(time);
       message = this.createMessage(false, rid, time, PlayerAction.SEEK); 
-      this.postData(message);
+      socket.emit('postData', JSON.stringify(message));
     }
     this.setState({
       progress: percent,
@@ -141,34 +143,6 @@ var Youku = React.createClass({
       <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}> </div>
       <span>{message}</span>
       </div>;
-  },
-
-  postData:function(data) {
-    // Build the post string from an object
-    var post_data = JSON.stringify(data);
-
-    // An object of options to indicate where to post to
-    var post_options = {
-      host: serverIP,
-      port: port,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': post_data.length
-      }
-    };
-
-    // Set up the request
-    var post_req = http.request(post_options, function(res) {
-      //res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        console.log('Response: ' + chunk);
-      });
-    });
-
-    // post the data
-    post_req.write(post_data);
-    post_req.end();
   },
 
   createMessage: function (ack_msg_id, rid, time, action) {
@@ -196,7 +170,8 @@ var Youku = React.createClass({
     
     switch(data.msgType) {
     case msg.MsgType.CHECK_LATENCY:
-      this.postData(createMessage(true, rid));
+      //this.postData(createMessage(true, rid));
+      socket.emit('postData', JSON.stringify(createMessage(true, rid)));
       break;
     case msg.MsgType.ACTION:
       this.applyActionToPlayer(data, this.state.player);
