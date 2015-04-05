@@ -14,6 +14,9 @@ var serverIP = '67.161.30.248';
 var port = '8989';
 
 var socket = io.connect('http://' + serverIP + ':' + port);
+
+var defaultVideo = 'XODk5MTIyNjE2';
+
 // tutorial1.js
 var Youku = React.createClass({
   mixins: [ReactScriptLoaderMixin],
@@ -26,7 +29,8 @@ var Youku = React.createClass({
       scriptLoadError: false,
       player: null,
       'playerState': PlayerState.UNSTARTED,
-      progress: 0
+      progress: 0,
+      interval: null
     };
   },
 
@@ -39,22 +43,37 @@ var Youku = React.createClass({
   // successfully.
   onScriptLoaded: function() {
     this.setState({scriptLoading: false});
+    this.loadVideo(defaultVideo);
+  },
+
+  loadVideo: function() {
+    if (this.state.interval) {
+      clearInterval(this.state.interval);
+    }
+    var video_id = '';
+    if (this.isMounted() && this.refs.video_id) {
+      video_id = React.findDOMNode(this.refs.video_id).value.trim();
+    } else video_id = defaultVideo;
 
     var player = new YKU.Player('youkuplayer',{
       styleid: '0',
       client_id: '716d2b2fc5573842',
-      vid: 'XODk5MTIyNjE2',
+      vid: video_id,
       events:{
         onPlayStart: function(){ document.getElementById("title").style.color = "red";playVideo();},
         onPlayerReady: function(){   document.getElementById("title").style.color = "red";playVideo();}
       }
     });
+    var interval = setInterval(this.tick, 1000);
 
     this.setState({
-      player: player
+      player: player,
+      'playerState': PlayerState.UNSTARTED,
+      progress: 0,
+      interval: interval
     });
 
-    this.interval = setInterval(this.tick, 1000);
+    
   },
 
   tick: function() {
@@ -135,12 +154,13 @@ var Youku = React.createClass({
     } else {
       message = 'loading succeeded';
       input =  <button onClick={this.pauseVideo}> Pause </button>;
-      
     }
     return <div>
       {input}
       <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} />
       <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}> </div>
+      <input type="text" ref='video_id' defaultValue={defaultVideo}/>
+      <button onClick={this.loadVideo}> Load Video </button>
       <span>{message}</span>
       </div>;
   },
