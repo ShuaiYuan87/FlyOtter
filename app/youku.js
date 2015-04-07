@@ -46,14 +46,10 @@ var Youku = React.createClass({
     this.loadVideo(defaultVideo);
   },
 
-  loadVideo: function() {
+  loadVideo: function(video_id) {
     if (this.state.interval) {
       clearInterval(this.state.interval);
     }
-    var video_id = '';
-    if (this.isMounted() && this.refs.video_id) {
-      video_id = React.findDOMNode(this.refs.video_id).value.trim();
-    } else video_id = defaultVideo;
 
     var player = new YKU.Player('youkuplayer',{
       styleid: '0',
@@ -160,17 +156,28 @@ var Youku = React.createClass({
       <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} />
       <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}> </div>
       <input type="text" ref='video_id' defaultValue={defaultVideo}/>
-      <button onClick={this.loadVideo}> Load Video </button>
+      <button onClick={this.onLoadClick}> Load Video </button>
       <span>{message}</span>
       </div>;
   },
 
-  createMessage: function (ack_msg_id, rid, time, action) {
+  onLoadClick: function() {
+    var video_id = '';
+    if (this.isMounted() && this.refs.video_id) {
+      video_id = React.findDOMNode(this.refs.video_id).value.trim();
+    } else video_id = defaultVideo;
+    var message = this.createMessage(false, rid, 0, PlayerAction.RELOAD, video_id);
+    this.loadVideo(video_id);
+    socket.emit('postData', JSON.stringify(message));
+  },
+
+  createMessage: function (ack_msg_id, rid, time, action, vid) {
     var message = {
       clientTime: Date.now() / 1000,
       clientId: rid,
       playerTime: time,
       playerAction: action,
+      videoId: vid,
     };
     if (ack_msg_id) {
       message.ackMsgID = ack_msg_id;
@@ -215,6 +222,8 @@ var Youku = React.createClass({
       case PlayerAction.SEEK:
         this.state.player.seekTo(data.playerTime);
         break;
+      case PlayerAction.RELOAD:
+        this.loadVideo(data.videoId);
       }
     }
   },
