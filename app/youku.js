@@ -52,7 +52,7 @@ var Youku = React.createClass({
     }
 
     var player = new YKU.Player('youkuplayer',{
-      styleid: '0',
+      styleid: '7',
       client_id: '716d2b2fc5573842',
       vid: video_id,
       events:{
@@ -149,12 +149,16 @@ var Youku = React.createClass({
       message = 'loading failed';
     } else {
       message = 'loading succeeded';
-      input =  <button onClick={this.pauseVideo}> Pause </button>;
+      input =  <button onClick={this.pauseVideo} style={{float: 'left'}}> Pause </button>;
     }
-    return <div>
-      {input}
-      <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} />
-      <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}> </div>
+    return <div className="youku-container" style={{'display': 'inline-block'}}>
+      <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}>  </div>
+      <div style={{overflow: 'hidden'}}>
+          {input}
+            <div style={{backgroundColor: '#080000',  float: 'left', 'display': 'inline-block', width: '90%'}}>
+          <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} />
+              </div>
+      </div>
       <input type="text" ref='video_id' defaultValue={defaultVideo}/>
       <button onClick={this.onLoadClick}> Load Video </button>
       <span>{message}</span>
