@@ -14,6 +14,9 @@ var serverIP = '67.161.30.248';
 var port = '8989';
 
 var socket = io.connect('http://' + serverIP + ':' + port);
+
+var defaultVideo = 'XODk5MTIyNjE2';
+
 // tutorial1.js
 var Youku = React.createClass({
   mixins: [ReactScriptLoaderMixin],
@@ -26,7 +29,8 @@ var Youku = React.createClass({
       scriptLoadError: false,
       player: null,
       'playerState': PlayerState.UNSTARTED,
-      progress: 0
+      progress: 0,
+      interval: null
     };
   },
 
@@ -39,22 +43,33 @@ var Youku = React.createClass({
   // successfully.
   onScriptLoaded: function() {
     this.setState({scriptLoading: false});
+    this.loadVideo(defaultVideo);
+  },
+
+  loadVideo: function(video_id) {
+    if (this.state.interval) {
+      clearInterval(this.state.interval);
+    }
 
     var player = new YKU.Player('youkuplayer',{
-      styleid: '0',
+      styleid: '7',
       client_id: '716d2b2fc5573842',
-      vid: 'XODk5MTIyNjE2',
+      vid: video_id,
       events:{
         onPlayStart: function(){ document.getElementById("title").style.color = "red";playVideo();},
         onPlayerReady: function(){   document.getElementById("title").style.color = "red";playVideo();}
       }
     });
+    var interval = setInterval(this.tick, 1000);
 
     this.setState({
-      player: player
+      player: player,
+      'playerState': PlayerState.UNSTARTED,
+      progress: 0,
+      interval: interval
     });
 
-    this.interval = setInterval(this.tick, 1000);
+    
   },
 
   tick: function() {
@@ -134,23 +149,39 @@ var Youku = React.createClass({
       message = 'loading failed';
     } else {
       message = 'loading succeeded';
-      input =  <button onClick={this.pauseVideo}> Pause </button>;
-      
+      input =  <button onClick={this.pauseVideo} style={{float: 'left'}}> Pause </button>;
     }
-    return <div>
-      {input}
-      <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} />
-      <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}> </div>
+    return <div className="youku-container" style={{'display': 'inline-block'}}>
+      <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}>  </div>
+      <div style={{overflow: 'hidden'}}>
+          {input}
+            <div style={{backgroundColor: '#080000',  float: 'left', 'display': 'inline-block', width: '90%'}}>
+          <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} />
+              </div>
+      </div>
+      <input type="text" ref='video_id' defaultValue={defaultVideo}/>
+      <button onClick={this.onLoadClick}> Load Video </button>
       <span>{message}</span>
       </div>;
   },
 
-  createMessage: function (ack_msg_id, rid, time, action) {
+  onLoadClick: function() {
+    var video_id = '';
+    if (this.isMounted() && this.refs.video_id) {
+      video_id = React.findDOMNode(this.refs.video_id).value.trim();
+    } else video_id = defaultVideo;
+    var message = this.createMessage(false, rid, 0, PlayerAction.RELOAD, video_id);
+    this.loadVideo(video_id);
+    socket.emit('postData', JSON.stringify(message));
+  },
+
+  createMessage: function (ack_msg_id, rid, time, action, vid) {
     var message = {
       clientTime: Date.now() / 1000,
       clientId: rid,
       playerTime: time,
       playerAction: action,
+      videoId: vid,
     };
     if (ack_msg_id) {
       message.ackMsgID = ack_msg_id;
@@ -195,6 +226,8 @@ var Youku = React.createClass({
       case PlayerAction.SEEK:
         this.state.player.seekTo(data.playerTime);
         break;
+      case PlayerAction.RELOAD:
+        this.loadVideo(data.videoId);
       }
     }
   },
