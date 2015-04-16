@@ -1,12 +1,15 @@
 var React = require('react');
+
 var ReactScriptLoaderMixin = require('./ReactScriptLoader.js').ReactScriptLoaderMixin;
 var io = require('socket.io-client');
 var http = require('http');
 var UNIVERSE = 100000;
 var rid = Math.floor(Math.random() * UNIVERSE);
+var defaultRoomID = Math.floor(Math.random() * UNIVERSE);
 var PlayerState = require('lib/player_state');
 var PlayerAction = require('lib/player_action');
 var Progress = require('react-progressbar');
+var Router = require("react-router");
 var msg = require('lib/msg');
 
 var serverIP = '67.161.30.248';
@@ -19,19 +22,28 @@ var defaultVideo = 'XODk5MTIyNjE2';
 
 // tutorial1.js
 var Youku = React.createClass({
-  mixins: [ReactScriptLoaderMixin],
+  mixins: [ReactScriptLoaderMixin, Router.Navigation],
+  contextTypes: {
+    router: React.PropTypes.func
+  },
   getInitialState: function() {
-    socket.emit('create', 'room1');
-    socket.on('notification', this.messageRecieve);
-
     return {
       scriptLoading: true,
       scriptLoadError: false,
       player: null,
       'playerState': PlayerState.UNSTARTED,
       progress: 0,
-      interval: null
+      interval: null,
     };
+  },
+
+  componentDidMount: function() {
+    var { router } = this.context;
+    var roomID = router.getCurrentQuery().roomID;
+    roomID = roomID ? roomID : defaultRoomID;
+    socket.emit('create', 'room' + roomID.toString());
+    socket.on('notification', this.messageRecieve);
+    this.context.router.transitionTo('/', {}, {roomID: roomID});
   },
 
   // this function tells ReactScriptLoaderMixin where to load the script from
@@ -162,7 +174,13 @@ var Youku = React.createClass({
       <input type="text" ref='video_id' defaultValue={defaultVideo}/>
       <button onClick={this.onLoadClick}> Load Video </button>
       <span>{message}</span>
+
+      <button onClick={this.redirect}> Redirect </button>
       </div>;
+  },
+
+  redirect: function() {
+     this.context.router.transitionTo('/', {}, {roomID: roomID});
   },
 
   onLoadClick: function() {
