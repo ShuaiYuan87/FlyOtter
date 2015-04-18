@@ -26,6 +26,12 @@ var Youku = React.createClass({
   contextTypes: {
     router: React.PropTypes.func
   },
+
+  propTypes: {
+    width: React.PropTypes.string,
+    height: React.PropTypes.string,
+  },
+
   getInitialState: function() {
     return {
       scriptLoading: true,
@@ -163,8 +169,16 @@ var Youku = React.createClass({
       message = 'loading succeeded';
       input =  <button onClick={this.pauseVideo} style={{float: 'left'}}> Pause </button>;
     }
-    return <div className="youku-container" style={{'display': 'inline-block'}}>
-      <div id="youkuplayer" style={{'width': '480px', 'height': '400px'}}>  </div>
+
+    var height = this.props.height;
+    var containerNode = React.findDOMNode(this.refs.video_container);
+    if (containerNode) {
+      var actualWidth = containerNode.offsetWidth;
+      height = actualWidth * 9.0 / 16;
+    }
+        
+    return <div className="youku-container" ref='video_container' style={{width: this.props.width}} className={this.props.className}>
+      <div id="youkuplayer" style={{width: '100%', height: height}}>  </div>
       <div style={{overflow: 'hidden'}}>
           {input}
             <div style={{backgroundColor: '#080000',  float: 'left', 'display': 'inline-block', width: '90%'}}>
