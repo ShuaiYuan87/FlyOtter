@@ -13,6 +13,8 @@ var Progress = require('react-progressbar');
 var Router = require("react-router");
 var msg = require('lib/msg');
 
+require('youku-style.css');
+
 var serverIP = '67.161.30.248';
 //var serverIP = 'localhost';
 var port = '8989';
@@ -39,8 +41,9 @@ var Youku = React.createClass({
     return {
       scriptLoading: true,
       scriptLoadError: false,
+      scriptLoaded: false,
       player: null,
-      'playerState': PlayerState.UNSTARTED,
+      playerState: PlayerState.UNSTARTED,
       progress: 0,
       interval: null,
     };
@@ -63,7 +66,7 @@ var Youku = React.createClass({
   // ReactScriptLoaderMixin calls this function when the script has loaded
   // successfully.
   onScriptLoaded: function() {
-    this.setState({scriptLoading: false});
+    this.setState({scriptLoading: false, scriptLoaded:true});
     this.loadVideo(defaultVideo);
   },
 
@@ -110,7 +113,7 @@ var Youku = React.createClass({
     this.setState({scriptLoading: false, scriptLoadError: true});
   },
 
-  pauseVideo: function() {
+  toggleVideoState: function() {
     if (this.state.player !== null) {
       /*if (!this.state.playing) {
        this.state.player.playVideo();
@@ -133,12 +136,14 @@ var Youku = React.createClass({
       case PlayerState.PAUSED:
         this.state.playerState = PlayerState.PLAYING;
         this.state.player.playVideo();
-        message = this.createMessage(false, rid, 0, PlayerAction.PLAY); 
+        message = this.createMessage(false, rid, 0, PlayerAction.PLAY);
+        this.setState({playerState: PlayerState.PLAYING});
         break;
       default:
         this.state.playerState = PlayerState.PAUSED;
         this.state.player.pauseVideo();
-        message = this.createMessage(false, rid, 0, PlayerAction.PAUSE); 
+        message = this.createMessage(false, rid, 0, PlayerAction.PAUSE);
+        this.setState({playerState: PlayerState.PAUSED});
         break;
       }
       console.log(message);
@@ -163,14 +168,25 @@ var Youku = React.createClass({
 
   render: function() {
     var message;
-    var input;
+    var controlPanel;
+    var controlPanelHeight = '52px';
     if (this.state.scriptLoading) {
       message = 'loading script...';
     } else if (this.state.scriptLoadError) {
       message = 'loading failed';
     } else {
       message = 'loading succeeded';
-      input =  <button onClick={this.pauseVideo} style={{float: 'left'}}> Pause </button>;
+      var playButtonText = 'Play';
+      if (this.state.playerState === PlayerState.PLAYING) {
+        playButtonText = 'Pause';
+      }
+      
+      controlPanel = <div id="control-panel" style={{top: '-' + controlPanelHeight, height: controlPanelHeight}}>
+        <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} background="black"/>
+        <div>
+          <button onClick={this.toggleVideoState} style={{float: 'left'}}>  {playButtonText} </button>
+        </div>
+      </div>;
     }
 
     var height = this.props.height;
@@ -180,16 +196,14 @@ var Youku = React.createClass({
       height = actualWidth * 9.0 / 16;
     }
         
-    return <div className="youku-container" ref='video_container' style={{width: this.props.width}} className={this.props.className}>
+    return <div className="youku-container" ref='video_container'
+            style={{width: this.props.width, height: height}} className={this.props.className}>
       <input type="text" ref='username' defaultValue='username'/>
       <input type="text" ref='password' defaultValue='password'/>
       <button onClick={this.signUp}> Sign Up </button>
-      <div id="youkuplayer" style={{width: '100%', height: height}}>  </div>
+      <div id="youkuplayer" >  </div>
+     {controlPanel}
       <div style={{overflow: 'hidden'}}>
-          {input}
-            <div style={{backgroundColor: '#080000',  float: 'left', 'display': 'inline-block', width: '90%'}}>
-          <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} />
-              </div>
       </div>
       <input type="text" ref='video_id' defaultValue={defaultVideo}/>
       <button onClick={this.onLoadClick}> Load Video </button>
@@ -284,17 +298,19 @@ var Youku = React.createClass({
       switch (data.playerAction) {
       case PlayerAction.PLAY:
         this.state.player.playVideo();
-        this.state.playerState = PlayerState.PLAY;
+        this.setState({playerState: PlayerState.PLAYING});
         break;
       case PlayerAction.PAUSE:
-        this.state.playerState = PlayerState.PAUSED;
         this.state.player.pauseVideo();
+        this.setState({playerState: PlayerState.PAUSED});
         break;
       case PlayerAction.SEEK:
         this.state.player.seekTo(data.playerTime);
+        this.setState({playerState: PlayerState.PLAYING});
         break;
       case PlayerAction.RELOAD:
         this.loadVideo(data.videoId);
+        this.setState({playerState: PlayerState.PAUSED});
       }
     }
   },
