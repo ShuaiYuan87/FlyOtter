@@ -1,5 +1,6 @@
 var React = require('react');
-
+var Parse = require('parse').Parse;
+Parse.initialize("90I4DZgPdtQ4M0bYeaMMfWKpNqTlwCxdfgbAr7ef", "RT7oaftVYrCAyt9Nm5rTe1f2ij1ViGDPQsXvGiyi");
 var ReactScriptLoaderMixin = require('./ReactScriptLoader.js').ReactScriptLoaderMixin;
 var io = require('socket.io-client');
 var http = require('http');
@@ -19,6 +20,8 @@ var port = '8989';
 var socket = io.connect('http://' + serverIP + ':' + port);
 
 var defaultVideo = 'XODk5MTIyNjE2';
+
+
 
 // tutorial1.js
 var Youku = React.createClass({
@@ -121,9 +124,9 @@ var Youku = React.createClass({
        this.setState({
        playing: false
        });
-       }
+       }*/
        console.log(message);
-       this.postData(message);*/
+       this.postData(message);
       switch(this.state.playerState) {
       case PlayerState.UNSTARTED:
       case PlayerState.ENDED:
@@ -178,6 +181,9 @@ var Youku = React.createClass({
     }
         
     return <div className="youku-container" ref='video_container' style={{width: this.props.width}} className={this.props.className}>
+      <input type="text" ref='username' defaultValue='username'/>
+      <input type="text" ref='password' defaultValue='password'/>
+      <button onClick={this.signUp}> Sign Up </button>
       <div id="youkuplayer" style={{width: '100%', height: height}}>  </div>
       <div style={{overflow: 'hidden'}}>
           {input}
@@ -191,6 +197,35 @@ var Youku = React.createClass({
 
       <button onClick={this.redirect}> Redirect </button>
       </div>;
+  },
+
+  signUp: function() {
+    var user = new Parse.User();
+    var username = 'username';
+    var password = 'password';
+    if (this.isMounted() 
+     && this.refs.username
+     && this.refs.password) {
+      username = React.findDOMNode(this.refs.username).value.trim();
+      password = React.findDOMNode(this.refs.password).value.trim();
+    }
+    user.set("username", username);
+    user.set("password", password);
+    //user.set("email", "email@example.com");
+     
+    // other fields can be set just like with Parse.Object
+    //user.set("phone", "415-392-0202");
+     
+    user.signUp(null, {
+      success: function(user) {
+        // Hooray! Let them use the app now.
+        alert("Success of signUp!")
+      },
+      error: function(user, error) {
+        // Show the error message somewhere and let the user try again.
+        alert("Error: " + error.code + " " + error.message);
+      }
+    });
   },
 
   redirect: function() {
