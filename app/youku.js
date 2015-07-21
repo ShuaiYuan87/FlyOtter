@@ -12,10 +12,11 @@ var PlayerAction = require('lib/player_action');
 var Progress = require('react-progressbar');
 var Router = require("react-router");
 var msg = require('lib/msg');
-
+var init = false;
+var roomID;
 require('youku-style.css');
 
-var serverIP = '67.161.30.248';
+var serverIP = '73.231.32.235';
 //var serverIP = 'localhost';
 var port = '8989';
 
@@ -51,10 +52,12 @@ var Youku = React.createClass({
 
   componentDidMount: function() {
     var { router } = this.context;
-    var roomID = router.getCurrentQuery().roomID;
+    roomID = router.getCurrentQuery().roomID;
     roomID = roomID ? roomID : defaultRoomID;
     socket.emit('create', 'room' + roomID.toString());
     socket.on('notification', this.messageRecieve);
+    socket.on('check_state', this.checkRecieve);
+    socket.on('init', this.initRecieve);
     this.context.router.transitionTo('/', {}, {roomID: roomID});
   },
 
@@ -69,7 +72,10 @@ var Youku = React.createClass({
     this.setState({scriptLoading: false, scriptLoaded:true});
     this.loadVideo(defaultVideo);
   },
-
+sleepFor:function ( sleepDuration ){
+    var now = new Date().getTime();
+    while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+},
   loadVideo: function(video_id) {
     if (this.state.interval) {
       clearInterval(this.state.interval);
@@ -80,19 +86,24 @@ var Youku = React.createClass({
       client_id: '716d2b2fc5573842',
       vid: video_id,
       events:{
-        onPlayStart: function(){ document.getElementById("title").style.color = "red";playVideo();},
-        onPlayerReady: function(){   document.getElementById("title").style.color = "red";playVideo();}
+        onPlayStart: function(){ socket.emit('check_state', 'room' + roomID.toString());
+                                document.getElementById("title").style.color = "red";
+                                //this.state.player.pauseVideo();
+                              },
+        onPlayerReady: function(){ document.getElementById("title").style.color = "red";},
+        onPlayEnd: function() { }
       }
     });
     var interval = setInterval(this.tick, 1000);
-
+    
     this.setState({
       player: player,
       'playerState': PlayerState.UNSTARTED,
       progress: 0,
       interval: interval
     });
-
+    //this.sleepFor(5000);
+    //this.state.player.playVideo();
     
   },
 
@@ -128,8 +139,8 @@ var Youku = React.createClass({
        playing: false
        });
        }*/
-       console.log(message);
-       this.postData(message);
+       //console.log(message);
+       //this.postData(message);
       switch(this.state.playerState) {
       case PlayerState.UNSTARTED:
       case PlayerState.ENDED:
@@ -293,15 +304,56 @@ var Youku = React.createClass({
     return;
   },
 
+  checkRecieve: function(data){
+    data = JSON.parse(data.message);
+    console.log(data);
+    var player_action;
+    switch(this.state.playerState) {
+      case PlayerState.UNSTARTED:
+      case PlayerState.ENDED:
+      case PlayerState.PAUSED:
+        player_action = PlayerAction.PAUSE;
+        break;
+      case PlayerState.PLAYING:
+        player_action = PlayerAction.PLAY;
+        break;
+    }
+    var player = this.state.player;
+    if (player) {
+      var time = this.state.player.currentTime();
+      socket.emit('init', JSON.stringify(this.createMessage(false, rid, time, player_action, 0)));
+    }
+  },
+
+  initRecieve: function(data){
+    debugger;
+    if (init) {
+      return;
+    }
+    else {
+      data = JSON.parse(data.message);
+      console.log(data);
+      this.applyActionToPlayer(data, this.state.player);
+      
+      init = true;
+    }
+  },
+
   applyActionToPlayer: function (data, player) {
     if (this.state.player !== null) {
       switch (data.playerAction) {
       case PlayerAction.PLAY:
         this.state.player.playVideo();
+        if (data.playerTime != 0) {
+          this.state.player.seekTo(data.playerTime);
+        }
         this.setState({playerState: PlayerState.PLAYING});
         break;
       case PlayerAction.PAUSE:
         this.state.player.pauseVideo();
+        if (data.playerTime != 0) {
+          this.state.player.seekTo(data.playerTime);
+        }
         this.setState({playerState: PlayerState.PAUSED});
         break;
       case PlayerAction.SEEK:
