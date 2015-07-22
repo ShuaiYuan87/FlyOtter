@@ -11,7 +11,6 @@ var last_player_time; //in seconds
 var last_server_time;
 var latency = {};
 var current_state = state.PAUSED;
-var SEEK_THRESHOLD = 1;
 
 app.listen(8989);
 
@@ -23,7 +22,7 @@ last_server_time = Date.now();
 
 var owner_map = {};
 
-function sendMessage(message, room, owner_only, init) {
+function sendMessage(message, room, type, owner_only) {
 
     var msg_id = Math.floor(Math.random() * 10000);
     message.msgID = msg_id;
@@ -36,17 +35,11 @@ function sendMessage(message, room, owner_only, init) {
     console.error('sending message ' + msg_str + 'to ' + room);
     owner_only = typeof owner_only !== 'undefined' ? owner_only : false;
     if (owner_only) {
-        owner_map[room].emit('check_state', {'message': msg_str});
+        owner_map[room].emit(type, {'message': msg_str});
         console.error('owner_only');
     }
     else {
-        init = typeof init !== 'undefined' ? init : false;
-        if (!init) {
-            io.sockets.in(room).emit('notification', {'message': msg_str});
-        }
-        else {
-            io.sockets.in(room).emit('init', {'message': msg_str});
-        }
+        io.sockets.in(room).emit(type, {'message': msg_str});
     }
 }
 function sleepFor( sleepDuration ){
@@ -59,9 +52,6 @@ io.on('connection', function(socket){
         if (!(room in owner_map)) {
             owner_map[room] = socket;
         }
-        else {
-            
-        }
         socket.join(room);
         socket.room = room;
         console.log('socket joining ' + room);
@@ -70,7 +60,7 @@ io.on('connection', function(socket){
         var message = {
                 //reply_socket: socket,
         };
-        sendMessage(message, room, true);
+        sendMessage(message, room, 'check_state', true);
     });
     socket.on('postData', function (data) {
         console.error('received message ' + data);
@@ -82,22 +72,28 @@ io.on('connection', function(socket){
         // if the message is to request
         if (msgType == msg.MsgType.REQUEST) {
             data.msgType = msg.MsgType.ACTION;
-            sendMessage(data, socket.room);
+            sendMessage(data, socket.room, 'notification');
         }
         // ack latency check
         else if (msgType == msg.MsgType.ACK) {
             latency[data.clientId] = (Date.now()-data.timestamp)/2;
         }        
     });
-    socket.on('init', function (data) {
-        
-        console.error('received message ' + data);
+    socket.on('reload', function (data) {
+        console.error('received reload message ' + data);
         var data = JSON.parse(data);
         // Too much POST data, kill the connection!
         if (data.length > 1e6)
             request.connection.destroy();
-        //sleepFor(35000);
-        sendMessage(data, socket.room, false, true);
+        sendMessage(data, socket.room, 'reload');
+    });
+    socket.on('init', function (data) {
+        console.error('received init message ' + data);
+        var data = JSON.parse(data);
+        // Too much POST data, kill the connection!
+        if (data.length > 1e6)
+            request.connection.destroy();
+        sendMessage(data, socket.room, 'init');
     });
     socket.on('disconnect', function(){
         console.log('socket leaving ' + socket.room);
@@ -105,11 +101,11 @@ io.on('connection', function(socket){
     });
 });
 
-setInterval(function checkLatency() {
+/*setInterval(function checkLatency() {
     var message = {
         msgType: msg.MsgType.CHECK_LATENCY,
         timestamp: Date.now()
     };
  //   sendMessage(message);
-}, 300000);
+}, 300000);*/
 

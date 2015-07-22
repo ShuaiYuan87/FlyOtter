@@ -53,11 +53,16 @@ var Youku = React.createClass({
   componentDidMount: function() {
     var { router } = this.context;
     roomID = router.getCurrentQuery().roomID;
-    roomID = roomID ? roomID : defaultRoomID;
+    if (typeof roomID === 'undefined')
+    {
+      init = true;
+      roomID = defaultRoomID;
+    }
     socket.emit('create', 'room' + roomID.toString());
     socket.on('notification', this.messageRecieve);
     socket.on('check_state', this.checkRecieve);
     socket.on('init', this.initRecieve);
+    socket.on('reload', this.reloadRecieve);
     this.context.router.transitionTo('/', {}, {roomID: roomID});
   },
 
@@ -88,7 +93,9 @@ sleepFor:function ( sleepDuration ){
       events:{
         onPlayStart: function(){ socket.emit('check_state', 'room' + roomID.toString());
                                 document.getElementById("title").style.color = "red";
-                                //this.state.player.pauseVideo();
+                                if (!init) {
+                                  this.state.player.pauseVideo();
+                                }
                               },
         onPlayerReady: function(){ document.getElementById("title").style.color = "red";},
         onPlayEnd: function() { }
@@ -264,7 +271,7 @@ sleepFor:function ( sleepDuration ){
     } else video_id = defaultVideo;
     var message = this.createMessage(false, rid, 0, PlayerAction.RELOAD, video_id);
     this.loadVideo(video_id);
-    socket.emit('postData', JSON.stringify(message));
+    socket.emit('reload', JSON.stringify(message));
   },
 
   createMessage: function (ack_msg_id, rid, time, action, vid) {
@@ -326,7 +333,6 @@ sleepFor:function ( sleepDuration ){
   },
 
   initRecieve: function(data){
-    debugger;
     if (init) {
       return;
     }
@@ -334,9 +340,17 @@ sleepFor:function ( sleepDuration ){
       data = JSON.parse(data.message);
       console.log(data);
       this.applyActionToPlayer(data, this.state.player);
-      
       init = true;
     }
+  },
+
+  reloadRecieve: function(data){
+    data = JSON.parse(data.message);
+    console.log(data);
+    if (parseInt(data.clientId) === rid) {
+      return;
+    }
+    this.loadVideo(data.videoId);
   },
 
   applyActionToPlayer: function (data, player) {
