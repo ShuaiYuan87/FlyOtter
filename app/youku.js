@@ -16,8 +16,9 @@ var init = false;
 var roomID;
 require('youku-style.css');
 
-var serverIP = '73.231.32.235';
-//var serverIP = 'localhost';
+// var serverIP = '73.231.32.235';
+// var serverIP = 'localhost';
+var serverIP = 'guarded-castle-1605.herokuapp.com';
 var port = '8989';
 
 var socket = io.connect('http://' + serverIP + ':' + port);
