@@ -1,1 +1,1 @@
-web: npm run start
+worker: node youtube_sync_service.js
