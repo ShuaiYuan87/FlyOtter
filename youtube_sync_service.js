@@ -11,7 +11,7 @@ var last_player_time; //in seconds
 var last_server_time;
 var latency = {};
 var current_state = state.PAUSED;
-
+var users = [];
 app.listen(8989);
 
 console.error('Start listening');
@@ -98,6 +98,29 @@ io.on('connection', function(socket){
     socket.on('disconnect', function(){
         console.log('socket leaving ' + socket.room);
         socket.leave(socket.room);
+        users.splice(socket.userIndex, 1);
+        socket.broadcast.emit('system', socket.nickname, users.length, 'logout');
+    });
+    socket.on('login', function(nickname) {
+        console.error('received nickname message ' + nickname);
+        if (users.indexOf(nickname) > -1) {
+            socket.emit('nickExisted');
+        } else {
+            socket.userIndex = users.length;
+            socket.nickname = nickname;
+            users.push(nickname);
+            socket.emit('loginSuccess');
+            io.sockets.emit('system', nickname, users.length, 'login');
+        };
+    });
+    
+    //new message get
+    socket.on('postMsg', function(msg, color) {
+        socket.broadcast.emit('newMsg', socket.nickname, msg, color);
+    });
+    //new image get
+    socket.on('img', function(imgData, color) {
+        socket.broadcast.emit('newImg', socket.nickname, imgData, color);
     });
 });
 
