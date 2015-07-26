@@ -110,117 +110,117 @@ var Youku = React.createClass({
     socket.on('check_state', this.checkRecieve);
     socket.on('init', this.initRecieve);
     socket.on('reload', this.reloadRecieve);
-    socket.on('connect', function() {
-        document.getElementById('info').textContent = 'get yourself a nickname :)';
-        document.getElementById('nickWrapper').style.display = 'block';
-        document.getElementById('nicknameInput').focus();
-    });
-    socket.on('nickExisted', function() {
-        document.getElementById('info').textContent = '!nickname is taken, choose another pls';
-    });
-    socket.on('loginSuccess', function() {
-        document.title = 'hichat | ' + document.getElementById('nicknameInput').value;
-        document.getElementById('loginWrapper').style.display = 'none';
-        document.getElementById('messageInput').focus();
-    });
-    socket.on('error', function(err) {
-        if (document.getElementById('loginWrapper').style.display == 'none') {
-            document.getElementById('status').textContent = '!fail to connect :(';
-        } else {
-            document.getElementById('info').textContent = '!fail to connect :(';
-        }
-    });
-    socket.on('system', function(nickName, userCount, type) {
-        var msg = nickName + (type == 'login' ? ' joined' : ' left');
-        that._displayNewMsg('system ', msg, 'red');
-        document.getElementById('status').textContent = userCount + (userCount > 1 ? ' users' : ' user') + ' online';
-    });
-    socket.on('newMsg', function(user, msg, color) {
-        that._displayNewMsg(user, msg, color);
-    });
-    socket.on('newImg', function(user, img, color) {
-        that._displayImage(user, img, color);
-    });
+    // socket.on('connect', function() {
+    //     document.getElementById('info').textContent = 'get yourself a nickname :)';
+    //     document.getElementById('nickWrapper').style.display = 'block';
+    //     document.getElementById('nicknameInput').focus();
+    // });
+    // socket.on('nickExisted', function() {
+    //     document.getElementById('info').textContent = '!nickname is taken, choose another pls';
+    // });
+    // socket.on('loginSuccess', function() {
+    //     document.title = 'hichat | ' + document.getElementById('nicknameInput').value;
+    //     document.getElementById('loginWrapper').style.display = 'none';
+    //     document.getElementById('messageInput').focus();
+    // });
+    // socket.on('error', function(err) {
+    //     if (document.getElementById('loginWrapper').style.display == 'none') {
+    //         document.getElementById('status').textContent = '!fail to connect :(';
+    //     } else {
+    //         document.getElementById('info').textContent = '!fail to connect :(';
+    //     }
+    // });
+    // socket.on('system', function(nickName, userCount, type) {
+    //     var msg = nickName + (type == 'login' ? ' joined' : ' left');
+    //     that._displayNewMsg('system ', msg, 'red');
+    //     document.getElementById('status').textContent = userCount + (userCount > 1 ? ' users' : ' user') + ' online';
+    // });
+    // socket.on('newMsg', function(user, msg, color) {
+    //     that._displayNewMsg(user, msg, color);
+    // });
+    // socket.on('newImg', function(user, img, color) {
+    //     that._displayImage(user, img, color);
+    // });
     this.context.router.transitionTo('/', {}, {roomID: roomID});
-    document.getElementById('loginBtn').addEventListener('click', function() {
-        var nickName = document.getElementById('nicknameInput').value;
-        if (nickName.trim().length != 0) {
-            socket.emit('login', nickName);
-        } else {
-            document.getElementById('nicknameInput').focus();
-        };
-    }, false);
-    document.getElementById('nicknameInput').addEventListener('keyup', function(e) {
-        if (e.keyCode == 13) {
-            var nickName = document.getElementById('nicknameInput').value;
-            if (nickName.trim().length != 0) {
-                socket.emit('login', nickName);
-            };
-        };
-    }, false);
-    document.getElementById('sendBtn').addEventListener('click', function() {
-        var messageInput = document.getElementById('messageInput'),
-            msg = messageInput.value,
-            color = document.getElementById('colorStyle').value;
-        messageInput.value = '';
-        messageInput.focus();
-        if (msg.trim().length != 0) {
-            socket.emit('postMsg', msg, color);
-            that._displayNewMsg('me', msg, color);
-            return;
-        };
-    }, false);
-    document.getElementById('messageInput').addEventListener('keyup', function(e) {
-        var messageInput = document.getElementById('messageInput'),
-            msg = messageInput.value,
-            color = document.getElementById('colorStyle').value;
-        if (e.keyCode == 13 && msg.trim().length != 0) {
-            messageInput.value = '';
-            socket.emit('postMsg', msg, color);
-            that._displayNewMsg('me', msg, color);
-        };
-    }, false);
-    document.getElementById('clearBtn').addEventListener('click', function() {
-        document.getElementById('historyMsg').innerHTML = '';
-    }, false);
-    document.getElementById('sendImage').addEventListener('change', function() {
-        if (this.files.length != 0) {
-            var file = this.files[0],
-                reader = new FileReader(),
-                color = document.getElementById('colorStyle').value;
-            if (!reader) {
-                that._displayNewMsg('system', '!your browser doesn\'t support fileReader', 'red');
-                this.value = '';
-                return;
-            };
-            reader.onload = function(e) {
-                this.value = '';
-                socket.emit('img', e.target.result, color);
-                that._displayImage('me', e.target.result, color);
-            };
-            reader.readAsDataURL(file);
-        };
-    }, false);
-    that._initialEmoji();
-    document.getElementById('emoji').addEventListener('click', function(e) {
-        var emojiwrapper = document.getElementById('emojiWrapper');
-        emojiwrapper.style.display = 'block';
-        e.stopPropagation();
-    }, false);
-    document.body.addEventListener('click', function(e) {
-        var emojiwrapper = document.getElementById('emojiWrapper');
-        if (e.target != emojiwrapper) {
-            emojiwrapper.style.display = 'none';
-        };
-    });
-    document.getElementById('emojiWrapper').addEventListener('click', function(e) {
-        var target = e.target;
-        if (target.nodeName.toLowerCase() == 'img') {
-            var messageInput = document.getElementById('messageInput');
-            messageInput.focus();
-            messageInput.value = messageInput.value + '[emoji:' + target.title + ']';
-        };
-    }, false);
+    // document.getElementById('loginBtn').addEventListener('click', function() {
+    //     var nickName = document.getElementById('nicknameInput').value;
+    //     if (nickName.trim().length != 0) {
+    //         socket.emit('login', nickName);
+    //     } else {
+    //         document.getElementById('nicknameInput').focus();
+    //     };
+    // }, false);
+    // document.getElementById('nicknameInput').addEventListener('keyup', function(e) {
+    //     if (e.keyCode == 13) {
+    //         var nickName = document.getElementById('nicknameInput').value;
+    //         if (nickName.trim().length != 0) {
+    //             socket.emit('login', nickName);
+    //         };
+    //     };
+    // }, false);
+    // document.getElementById('sendBtn').addEventListener('click', function() {
+    //     var messageInput = document.getElementById('messageInput'),
+    //         msg = messageInput.value,
+    //         color = document.getElementById('colorStyle').value;
+    //     messageInput.value = '';
+    //     messageInput.focus();
+    //     if (msg.trim().length != 0) {
+    //         socket.emit('postMsg', msg, color);
+    //         that._displayNewMsg('me', msg, color);
+    //         return;
+    //     };
+    // }, false);
+    // document.getElementById('messageInput').addEventListener('keyup', function(e) {
+    //     var messageInput = document.getElementById('messageInput'),
+    //         msg = messageInput.value,
+    //         color = document.getElementById('colorStyle').value;
+    //     if (e.keyCode == 13 && msg.trim().length != 0) {
+    //         messageInput.value = '';
+    //         socket.emit('postMsg', msg, color);
+    //         that._displayNewMsg('me', msg, color);
+    //     };
+    // }, false);
+    // document.getElementById('clearBtn').addEventListener('click', function() {
+    //     document.getElementById('historyMsg').innerHTML = '';
+    // }, false);
+    // document.getElementById('sendImage').addEventListener('change', function() {
+    //     if (this.files.length != 0) {
+    //         var file = this.files[0],
+    //             reader = new FileReader(),
+    //             color = document.getElementById('colorStyle').value;
+    //         if (!reader) {
+    //             that._displayNewMsg('system', '!your browser doesn\'t support fileReader', 'red');
+    //             this.value = '';
+    //             return;
+    //         };
+    //         reader.onload = function(e) {
+    //             this.value = '';
+    //             socket.emit('img', e.target.result, color);
+    //             that._displayImage('me', e.target.result, color);
+    //         };
+    //         reader.readAsDataURL(file);
+    //     };
+    // }, false);
+    // that._initialEmoji();
+    // document.getElementById('emoji').addEventListener('click', function(e) {
+    //     var emojiwrapper = document.getElementById('emojiWrapper');
+    //     emojiwrapper.style.display = 'block';
+    //     e.stopPropagation();
+    // }, false);
+    // document.body.addEventListener('click', function(e) {
+    //     var emojiwrapper = document.getElementById('emojiWrapper');
+    //     if (e.target != emojiwrapper) {
+    //         emojiwrapper.style.display = 'none';
+    //     };
+    // });
+    // document.getElementById('emojiWrapper').addEventListener('click', function(e) {
+    //     var target = e.target;
+    //     if (target.nodeName.toLowerCase() == 'img') {
+    //         var messageInput = document.getElementById('messageInput');
+    //         messageInput.focus();
+    //         messageInput.value = messageInput.value + '[emoji:' + target.title + ']';
+    //     };
+    // }, false);
   },
 
   // this function tells ReactScriptLoaderMixin where to load the script from
@@ -386,37 +386,7 @@ sleepFor:function ( sleepDuration ){
         <span>{message}</span>
 
         <button onClick={this.redirect}> Redirect </button>
-        <div className="wrapper">
-            <div className="banner">
-                <h1>HiChat :)</h1>
-                <span id="status"></span>
-            </div>
-            <div id="historyMsg">
-            </div>
-            <div className="controls" >
-                <div className="items">
-                    <input id="colorStyle" type="color" placeHolder='#000' title="font color" />
-                    <input id="emoji" type="button" value="emoji" title="emoji" />
-                    <label for="sendImage" className="imageLable">
-                        <input type="button" value="image"  />
-                        <input id="sendImage" type="file" value="image"/>
-                    </label>
-                    <input id="clearBtn" type="button" value="clear" title="clear screen" />
-                </div>
-                <textarea id="messageInput" placeHolder="enter to send"></textarea>
-                <input id="sendBtn" type="button" value="SEND" />
-                <div id="emojiWrapper">
-                </div>
-            </div>
-        </div>
-        <div id="loginWrapper">
-            <p id="info">connecting to server...</p>
-            <div id="nickWrapper">
-                <input type="text" placeHolder="nickname" id="nicknameInput" />
-                <input type="button" value="OK" id="loginBtn" />
-            </div>
-        </div>
-      </div>;
+         </div>;
   },
 
   signUp: function() {
@@ -571,3 +541,37 @@ sleepFor:function ( sleepDuration ){
 });
 
 module.exports = Youku;
+
+
+
+
+        // <div className="wrapper">
+        //     <div className="banner">
+        //         <h1>HiChat :)</h1>
+        //         <span id="status"></span>
+        //     </div>
+        //     <div id="historyMsg">
+        //     </div>
+        //     <div className="controls" >
+        //         <div className="items">
+        //             <input id="colorStyle" type="color" placeHolder='#000' title="font color" />
+        //             <input id="emoji" type="button" value="emoji" title="emoji" />
+        //             <label for="sendImage" className="imageLable">
+        //                 <input type="button" value="image"  />
+        //                 <input id="sendImage" type="file" value="image"/>
+        //             </label>
+        //             <input id="clearBtn" type="button" value="clear" title="clear screen" />
+        //         </div>
+        //         <textarea id="messageInput" placeHolder="enter to send"></textarea>
+        //         <input id="sendBtn" type="button" value="SEND" />
+        //         <div id="emojiWrapper">
+        //         </div>
+        //     </div>
+        // </div>
+        // <div id="loginWrapper">
+        //     <p id="info">connecting to server...</p>
+        //     <div id="nickWrapper">
+        //         <input type="text" placeHolder="nickname" id="nicknameInput" />
+        //         <input type="button" value="OK" id="loginBtn" />
+        //     </div>
+        // </div>
