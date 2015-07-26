@@ -16,9 +16,10 @@ var init = false;
 var roomID;
 require('youku-style.css');
 require('main.css');
-var serverIP = '73.231.32.235';
-//var serverIP = 'localhost';
-var port = '8989';
+// var serverIP = '73.231.32.235';
+// var serverIP = 'localhost';
+var serverIP = 'lit-headland-2085.herokuapp.com';
+var port = '80';
 
 var socket = io.connect('http://' + serverIP + ':' + port);
 

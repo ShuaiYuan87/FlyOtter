@@ -12,9 +12,16 @@ var last_server_time;
 var latency = {};
 var current_state = state.PAUSED;
 var users = [];
-app.listen(8989);
 
-console.error('Start listening');
+var port = 8989;
+process.argv.forEach(function (val, index, array) {
+  if (index == 2) {
+    port = parseInt(val, 10);
+  }
+});
+
+console.error('Start listening at port: ' + port.toString());
+app.listen(port);
 
 last_player_time = 0;
 
