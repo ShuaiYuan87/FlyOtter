@@ -6,7 +6,7 @@ var Checkbox = require('react-checkbox');
 var Progress = require('react-progressbar');
 //var Progress = require('react-progress');
 var YoukuWrapper = require('../youku.js');
-
+//var YoutubePlayerWrapper = require('../youtube-wrapper.js');
 //var cx = require('cx');
 
 module.exports = React.createClass({

@@ -16,11 +16,11 @@ var init = false;
 var roomID;
 require('youku-style.css');
 require('main.css');
-// var serverIP = '73.231.32.235';
-// var serverIP = 'localhost';
-var serverIP = 'lit-headland-2085.herokuapp.com';
-var port = '80';
-
+var serverIP = '73.231.32.235';
+//var serverIP = 'localhost';
+//var serverIP = 'lit-headland-2085.herokuapp.com';
+//var port = '80';
+var port = '8989';
 var socket = io.connect('http://' + serverIP + ':' + port);
 
 var defaultVideo = 'XODk5MTIyNjE2';
@@ -37,7 +37,7 @@ var Youku = React.createClass({
     height: React.PropTypes.string,
   },
 
-  _initialEmoji: function() {
+  /*_initialEmoji: function() {
     var emojiContainer = document.getElementById('emojiWrapper'),
         docFragment = document.createDocumentFragment();
     for (var i = 69; i > 0; i--) {
@@ -47,13 +47,13 @@ var Youku = React.createClass({
         docFragment.appendChild(emojiItem);
     };
     emojiContainer.appendChild(docFragment);
-  },
+  },*/
   _displayNewMsg: function(user, msg, color) {
       var container = document.getElementById('historyMsg'),
           msgToDisplay = document.createElement('p'),
-          date = new Date().toTimeString().substr(0, 8),
+          date = new Date().toTimeString().substr(0, 8);
           //determine whether the msg contains emoji
-          msg = this._showEmoji(msg);
+          //msg = this._showEmoji(msg);
       msgToDisplay.style.color = color || '#000';
       msgToDisplay.innerHTML = user + '<span class="timespan">(' + date + '): </span>' + msg;
       container.appendChild(msgToDisplay);
@@ -68,7 +68,7 @@ var Youku = React.createClass({
       container.appendChild(msgToDisplay);
       container.scrollTop = container.scrollHeight;
   },
-  _showEmoji: function(msg) {
+  /*_showEmoji: function(msg) {
       var match, result = msg,
           reg = /\[emoji:\d+\]/g,
           emojiIndex,
@@ -82,7 +82,7 @@ var Youku = React.createClass({
           };
       };
       return result;
-  },
+  },*/
 
   getInitialState: function() {
     return {
@@ -97,6 +97,22 @@ var Youku = React.createClass({
   },
 
   componentDidMount: function() {
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '106676343020606',
+        xfbml      : true,
+        version    : 'v2.4'
+      });
+    };
+
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "//connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+
     var that = this;
     var { router } = this.context;
     roomID = router.getCurrentQuery().roomID;
@@ -142,6 +158,7 @@ var Youku = React.createClass({
     //     that._displayImage(user, img, color);
     // });
     this.context.router.transitionTo('/', {}, {roomID: roomID});
+
     // document.getElementById('loginBtn').addEventListener('click', function() {
     //     var nickName = document.getElementById('nicknameInput').value;
     //     if (nickName.trim().length != 0) {
@@ -371,7 +388,9 @@ sleepFor:function ( sleepDuration ){
       var actualWidth = containerNode.offsetWidth;
       height = actualWidth * 9.0 / 16;
     }
-        
+    
+    
+    //var fbsdk = require('./sdk.js');
     return <div className="youku-container" ref='video_container'
             style={{width: this.props.width, height: height}} className={this.props.className}>
         <input type="text" ref='username' defaultValue='username'/>
@@ -383,10 +402,14 @@ sleepFor:function ( sleepDuration ){
         </div>
         <input type="text" ref='video_id' defaultValue={defaultVideo}/>
         <button onClick={this.onLoadClick}> Load Video </button>
-        <span>{message}</span>
-
+        <span>{message}</span>      
         <button onClick={this.redirect}> Redirect </button>
-         </div>;
+        
+        <div className="fb-share-button" 
+          data-href="http://www.keekwoon.com" 
+          data-layout="button_count">
+        </div>
+      </div>;
   },
 
   signUp: function() {
@@ -423,10 +446,19 @@ sleepFor:function ( sleepDuration ){
   },
 
   onLoadClick: function() {
-    var video_id = '';
+    var video_id = defaultVideo;
     if (this.isMounted() && this.refs.video_id) {
-      video_id = React.findDOMNode(this.refs.video_id).value.trim();
-    } else video_id = defaultVideo;
+      var url = React.findDOMNode(this.refs.video_id).value.trim();
+      if (url.indexOf("youku") != -1)
+      {
+        var id_index = url.indexOf("id_");
+        var html_index = url.indexOf(".html");
+        if (id_index != -1 && html_index != -1)
+        {
+          video_id = url.substring(id_index+3, html_index);
+        }
+      }
+    }
     var message = this.createMessage(false, rid, 0, PlayerAction.RELOAD, video_id);
     this.loadVideo(video_id);
     socket.emit('reload', JSON.stringify(message));
