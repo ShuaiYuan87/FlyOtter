@@ -4,3 +4,5 @@
 !/node_modules/react-progressbar
 *.log
 *~
+*.org
+.*

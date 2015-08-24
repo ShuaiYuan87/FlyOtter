@@ -1,3 +1,4 @@
+/*global  */
 var path = require("path");
 var webpack = require("webpack");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
@@ -9,16 +10,14 @@ module.exports = function(options) {
 		main: reactEntry("main"),
 		// second: reactEntry("second")
 	};
+
+      console.log(options.hotComponents);
 	var loaders = {
 		"coffee": "coffee-redux-loader",
-		"jsx": options.hotComponents ? ["react-hot-loader", "jsx-loader?harmony"] : "jsx-loader?harmony",
+		"jsx": ["jsx-loader?harmony&stripTypes", 'flowcheck'],
+		// options.hotComponents ? ["react-hot-loader", 'flowcheck', "jsx-loader?harmony"] : "jsx-loader?harmony",
 		"json": "json-loader",
-		"js": options.hotComponents ? ["react-hot-loader", "jsx-loader?harmony"] : "jsx-loader?harmony",
-
-          // {
-	  //       	loader: "6to5-loader",
-	  //       	include: path.join(__dirname, "app")
-	  //       },
+		"js": ["jsx-loader?harmony&stripTypes", 'flowcheck'],
 		"json5": "json5-loader",
 		"txt": "raw-loader",
 		"png|jpg|jpeg|gif|svg": "url-loader?limit=10000",
@@ -63,7 +62,8 @@ module.exports = function(options) {
 	};
 	var excludeFromStats = [
 		/node_modules[\\\/]react(-router)?[\\\/]/,
-		/node_modules[\\\/]items-store[\\\/]/
+		/node_modules[\\\/]items-store[\\\/]/,
+              /node_modules/
 	];
 	var plugins = [
 		function() {

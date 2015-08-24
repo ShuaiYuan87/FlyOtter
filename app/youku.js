@@ -236,7 +236,7 @@ var Youku = React.createClass({
   },
 sleepFor:function ( sleepDuration ){
     var now = new Date().getTime();
-    while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+    while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
 },
   loadVideo: function(video_id) {
     this.setState({scriptLoading: false, scriptLoaded:true});
@@ -260,7 +260,7 @@ sleepFor:function ( sleepDuration ){
       }
     });
     var interval = setInterval(this.tick, 1000);
-    
+
     this.setState({
       player: player,
       'playerState': PlayerState.UNSTARTED,
@@ -269,7 +269,7 @@ sleepFor:function ( sleepDuration ){
     });
     //this.sleepFor(5000);
     //this.state.player.playVideo();
-    
+
   },
 
   tick: function() {
@@ -299,7 +299,7 @@ sleepFor:function ( sleepDuration ){
        });
        } else {
        this.state.player.pauseVideo();
-       message = this.createMessage(false, rid, 0, PlayerAction.PAUSE); 
+       message = this.createMessage(false, rid, 0, PlayerAction.PAUSE);
        this.setState({
        playing: false
        });
@@ -334,7 +334,7 @@ sleepFor:function ( sleepDuration ){
     if (player) {
       var time = percent * player.totalTime() / 100;
       player.seekTo(time);
-      message = this.createMessage(false, rid, time, PlayerAction.SEEK); 
+      message = this.createMessage(false, rid, time, PlayerAction.SEEK);
       socket.emit('postData', JSON.stringify(message));
     }
     this.setState({
@@ -356,7 +356,7 @@ sleepFor:function ( sleepDuration ){
       if (this.state.playerState === PlayerState.PLAYING) {
         playButtonText = 'Pause';
       }
-      
+
       controlPanel = <div id="control-panel" style={{top: '-' + controlPanelHeight, height: controlPanelHeight}}>
         <Progress onProgressChange={this._handleProgressChange} completed={this.state.progress} background="black"/>
         <div>
@@ -371,9 +371,9 @@ sleepFor:function ( sleepDuration ){
       var actualWidth = containerNode.offsetWidth;
       height = actualWidth * 9.0 / 16;
     }
-        
+
     return <div className="youku-container" ref='video_container'
-            style={{width: this.props.width, height: height}} className={this.props.className}>
+            style={{width: this.props.width, height: height}} >
         <input type="text" ref='username' defaultValue='username'/>
         <input type="text" ref='password' defaultValue='password'/>
         <button onClick={this.signUp}> Sign Up </button>
@@ -393,7 +393,7 @@ sleepFor:function ( sleepDuration ){
     var user = new Parse.User();
     var username = 'username';
     var password = 'password';
-    if (this.isMounted() 
+    if (this.isMounted()
      && this.refs.username
      && this.refs.password) {
       username = React.findDOMNode(this.refs.username).value.trim();
@@ -402,10 +402,10 @@ sleepFor:function ( sleepDuration ){
     user.set("username", username);
     user.set("password", password);
     //user.set("email", "email@example.com");
-     
+
     // other fields can be set just like with Parse.Object
     //user.set("phone", "415-392-0202");
-     
+
     user.signUp(null, {
       success: function(user) {
         // Hooray! Let them use the app now.
@@ -455,7 +455,7 @@ sleepFor:function ( sleepDuration ){
       return;
     }
     console.log(data);
-    
+
     switch(data.msgType) {
     case msg.MsgType.CHECK_LATENCY:
       //this.postData(createMessage(true, rid));
@@ -465,7 +465,7 @@ sleepFor:function ( sleepDuration ){
       this.applyActionToPlayer(data, this.state.player);
       break;
     }
-    
+
     return;
   },
 

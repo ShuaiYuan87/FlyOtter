@@ -1,5 +1,11 @@
 body {
-	background: #eee;
+
+}
+
+.local[banner] {
+	background: #CCCCFF;
+	height: 20;
+	width: 100%;
 }
 
 .application {
