@@ -13,7 +13,7 @@ class PlaybackControl {
   static isLoadedByScripts: Object;  // a map of script to loaded
   static scriptLoaderID: number;
   static loaders: Array<IVideoLoader>;
-  static playbackControl: ?PlaybackControl;
+  static playbackControl: PlaybackControl;
 
   static getControl(): PlaybackControl {
     if (!PlaybackControl.playbackControl) {
@@ -32,12 +32,12 @@ class PlaybackControl {
     return PlaybackControl.loaders;
   }
 
-  loadVideo(url: string): void {
+  loadVideo(htmlElementID: string, url: string): void {
     var loader = this._findLoader(url);
 
     PlaybackControl.configLoaders().forEach(x => {
       if (x !== loader) {
-        x.clearVideo('youkuplayer');
+        x.clearVideo(htmlElementID);
       }
     });
     var iframeScript = loader.getScriptURL();
@@ -45,7 +45,7 @@ class PlaybackControl {
     if (!(iframeScript in PlaybackControl.isLoadedByScripts)) {
       loader.videoScriptReady = function() {
         PlaybackControl.isLoadedByScripts[iframeScript] = true;
-        this._loadVideo(url, loader);
+        this._loadVideo(htmlElementID, url, loader);
       }.bind(this);
 
       ReactScriptLoader.componentDidMount(
@@ -54,21 +54,28 @@ class PlaybackControl {
         iframeScript
       );
     } else {
-      this._loadVideo(url, loader);
+      this._loadVideo(htmlElementID, url, loader);
     }
   }
 
   _findLoader(videoUrl: string): IVideoLoader {
     var loaders = PlaybackControl.configLoaders().map(
-      loader => loader.isVideoURLValid(videoUrl) ? loader : null
-    ).filter(x => x !== null);
+      loader =>
+        loader.isVideoURLValid(videoUrl) && loader.parseVideoID(videoUrl)
+        ? loader
+        : null
+    );
+
+    loaders = loaders.filter(x => x !== null);
 
     invariant(loaders.length > 0, 'Input url does not have a loader');
-    return loaders[0];
+    var loader = loaders[0];
+    invariant(loader instanceof IVideoLoader, 'For flow');
+    return loader;
   }
 
-  _loadVideo(url: string, loader: any): void {
-    loader.loadVideo('youkuplayer', loader.parseVideoID(url));
+  _loadVideo(htmlElementID: string, url: string, loader: IVideoLoader): void {
+    loader.loadVideo(htmlElementID, loader.parseVideoID(url));
   }
 }
 

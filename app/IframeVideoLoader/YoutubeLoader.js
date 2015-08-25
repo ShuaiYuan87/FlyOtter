@@ -25,14 +25,20 @@ class YoutubeLoader extends IVideoLoader {
   }
 
   parseVideoID(url: string): string {
-    return url.match(/([A-Z])\w+/g)[0];
+    var id = '';
+    var splitted = url.replace(/(>|<)/gi,'')
+      .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+    if(splitted[2] !== undefined) {
+      id = splitted[2].split(/[^0-9a-z_\-]/i)[0];
+    }
+    return id;
   }
 
   loadVideo(htmlElementID: string, videoID: string): void {
     if (!this.player) {
       this.player = new YT.Player(htmlElementID, {
-          height: '390',
-          width: '640',
+          height: '800',
+          width: '900',
           videoId: videoID,
       });
     } else {
