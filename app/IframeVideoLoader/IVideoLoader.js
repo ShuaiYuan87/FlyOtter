@@ -2,6 +2,8 @@
 
 'use strict';
 
+var IVideoPlayback = require('../VideoPlayback/IVideoPlayback');
+
 /**
  * An interface for all different types of video loaders
  */
@@ -25,7 +27,7 @@ class IVideoLoader {
     return '';
   }
 
-  loadVideo(htmlElementID: string, videoID: string): void {}
+  loadVideo: (htmlElementID: string, videoID: string) => IVideoPlayback;
 
   clearVideo(htmlElementID: string): void {}
 }

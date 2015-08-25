@@ -29,6 +29,7 @@ var VideoPlayer = React.createClass({
         })} />
 
         <button onClick={this._loadVideo}>Load</button>
+        <button onClick={this._playVideo}>Play</button>
         <div style={styles.fullsizePlayer} id={VIDEO_PLAYER_ID}/>
       </div>
     );
@@ -38,6 +39,10 @@ var VideoPlayer = React.createClass({
     var playbackControl = PlaybackControl.getControl();
     playbackControl.loadVideo(VIDEO_PLAYER_ID, this.state.videoURL);
   },
+
+  _playVideo: function(evt: Object): void {
+    PlaybackControl.getControl().play();
+  }
 });
 
 var styles = StyleSheet.create({

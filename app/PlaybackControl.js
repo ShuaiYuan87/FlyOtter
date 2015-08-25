@@ -4,12 +4,14 @@
 
 var ReactScriptLoader = require('./ReactScriptLoader.js').ReactScriptLoader;
 var IVideoLoader = require('./IframeVideoLoader/IVideoLoader');
+var IVideoPlayback = require('./VideoPlayback/IVideoPlayback')
 var YoukuLoader = require('./IframeVideoLoader/YoukuLoader');
 var YoutubeLoader = require('./IframeVideoLoader/YoutubeLoader');
 
 var invariant = require('invariant');
 
 class PlaybackControl {
+  // static variables / methods
   static isLoadedByScripts: Object;  // a map of script to loaded
   static scriptLoaderID: number;
   static loaders: Array<IVideoLoader>;
@@ -32,20 +34,27 @@ class PlaybackControl {
     return PlaybackControl.loaders;
   }
 
-  loadVideo(htmlElementID: string, url: string): void {
+  // instance variables / methods
+  videoPlayback: ?IVideoPlayback;
+
+  loadVideo(htmlElementID: string, url: string): PlaybackControl {
     var loader = this._findLoader(url);
 
     PlaybackControl.configLoaders().forEach(x => {
       if (x !== loader) {
-        x.clearVideo(htmlElementID);
+        this._clearVideo(htmlElementID, x);
       }
     });
     var iframeScript = loader.getScriptURL();
 
+    // video playback might not be loaded immediately in the case that we'll
+    // need to download the script, therefore we will set it to null to indicate
+    // that event.
+    this.videoPlayback = null;
     if (!(iframeScript in PlaybackControl.isLoadedByScripts)) {
       loader.videoScriptReady = function() {
         PlaybackControl.isLoadedByScripts[iframeScript] = true;
-        this._loadVideo(htmlElementID, url, loader);
+        this.videoPlayback = this._loadVideo(htmlElementID, url, loader);
       }.bind(this);
 
       ReactScriptLoader.componentDidMount(
@@ -54,8 +63,17 @@ class PlaybackControl {
         iframeScript
       );
     } else {
-      this._loadVideo(htmlElementID, url, loader);
+      this.videoPlayback = this._loadVideo(htmlElementID, url, loader);
     }
+
+    return this;
+  }
+
+  play(): PlaybackControl {
+    if (this.videoPlayback) {
+      this.videoPlayback.play();
+    }
+    return this;
   }
 
   _findLoader(videoUrl: string): IVideoLoader {
@@ -74,8 +92,27 @@ class PlaybackControl {
     return loader;
   }
 
-  _loadVideo(htmlElementID: string, url: string, loader: IVideoLoader): void {
-    loader.loadVideo(htmlElementID, loader.parseVideoID(url));
+  _loadVideo(
+    htmlElementID: string,
+    url: string,
+    loader: IVideoLoader
+  ): IVideoPlayback {
+    // preserve the css class
+    // Replace the iframe element with a div
+    var iframeElement = document.getElementById(htmlElementID);
+    var style = iframeElement.getAttribute('style');
+    var playback = loader.loadVideo(htmlElementID, loader.parseVideoID(url));
+    document.getElementById(htmlElementID).setAttribute('style', style);
+    return playback;
+  }
+
+  _clearVideo(htmlElementID: string, loader: IVideoLoader): void {
+    // preserve the css class
+    // Replace the iframe element with a div
+    var iframeElement = document.getElementById(htmlElementID);
+    var style = iframeElement.getAttribute('style');
+    loader.clearVideo(htmlElementID);
+    document.getElementById(htmlElementID).setAttribute('style', style);
   }
 }
 

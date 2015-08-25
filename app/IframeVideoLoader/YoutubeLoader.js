@@ -3,12 +3,13 @@
 'use strict';
 
 var IVideoLoader = require('./IVideoLoader');
+var IVideoPlayback = require('../VideoPlayback/IVideoPlayback');
+var YoutubePlayback = require('../VideoPlayback/YoutubePlayback');
 
 class YoutubeLoader extends IVideoLoader {
   player: any;
 
   constructor() {
-    console.log('new youtube');
     window.onYouTubeIframeAPIReady = function() {
       // fire the scriptReady event if there's a handler
       this.videoScriptReady && this.videoScriptReady();
@@ -34,7 +35,7 @@ class YoutubeLoader extends IVideoLoader {
     return id;
   }
 
-  loadVideo(htmlElementID: string, videoID: string): void {
+  loadVideo(htmlElementID: string, videoID: string): IVideoPlayback {
     if (!this.player) {
       this.player = new YT.Player(htmlElementID, {
           height: '800',
@@ -44,6 +45,8 @@ class YoutubeLoader extends IVideoLoader {
     } else {
       this.player.loadVideoById(videoID);
     }
+
+    return new YoutubePlayback(this.player);
   }
 
   clearVideo(htmlElementID: string): void {
