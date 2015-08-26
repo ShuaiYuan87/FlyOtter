@@ -35,7 +35,8 @@ class PlaybackControl {
   }
 
   // instance variables / methods
-  videoPlayback: ?IVideoPlayback;
+  videoPlayback: IVideoPlayback;
+  isVideoPlayerReady: boolean;
 
   loadVideo(htmlElementID: string, url: string): PlaybackControl {
     var loader = this._findLoader(url);
@@ -48,9 +49,9 @@ class PlaybackControl {
     var iframeScript = loader.getScriptURL();
 
     // video playback might not be loaded immediately in the case that we'll
-    // need to download the script, therefore we will set it to null to indicate
-    // that event.
-    this.videoPlayback = null;
+    // need to download the script, therefore we will set it to default to
+    // prevent something malicious happening
+    this.videoPlayback = new IVideoPlayback();
     if (!(iframeScript in PlaybackControl.isLoadedByScripts)) {
       loader.videoScriptReady = function() {
         PlaybackControl.isLoadedByScripts[iframeScript] = true;
@@ -69,10 +70,22 @@ class PlaybackControl {
     return this;
   }
 
+  // Video playback callbacks
+  videoPlayerReady: () => void;
+
+  // Video playback Operations
   play(): PlaybackControl {
-    if (this.videoPlayback) {
-      this.videoPlayback.play();
-    }
+    this.videoPlayback.play();
+    return this;
+  }
+
+  pause(): PlaybackControl {
+    this.videoPlayback.pause();
+    return this;
+  }
+
+  seekTo(sec: number): PlaybackControl {
+    this.videoPlayback.seekTo(sec);
     return this;
   }
 
@@ -101,6 +114,11 @@ class PlaybackControl {
     // Replace the iframe element with a div
     var iframeElement = document.getElementById(htmlElementID);
     var style = iframeElement.getAttribute('style');
+    this.isVideoPlayerReady = false;
+    loader.videoPlayerReady = () => {
+      this.videoPlayerReady && this.videoPlayerReady();
+      this.isVideoPlayerReady = true;
+    }
     var playback = loader.loadVideo(htmlElementID, loader.parseVideoID(url));
     document.getElementById(htmlElementID).setAttribute('style', style);
     return playback;

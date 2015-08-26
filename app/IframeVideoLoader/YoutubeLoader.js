@@ -36,16 +36,14 @@ class YoutubeLoader extends IVideoLoader {
   }
 
   loadVideo(htmlElementID: string, videoID: string): IVideoPlayback {
-    if (!this.player) {
-      this.player = new YT.Player(htmlElementID, {
-          height: '800',
-          width: '900',
-          videoId: videoID,
-      });
-    } else {
-      this.player.loadVideoById(videoID);
+    if (this.player) {
+      this.clearVideo(htmlElementID);
     }
 
+    this.player = new YT.Player(htmlElementID, {
+        videoId: videoID,
+        'onReady': super.onVideoPlayerReady(),
+    });
     return new YoutubePlayback(this.player);
   }
 

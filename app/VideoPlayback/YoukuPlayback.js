@@ -14,6 +14,14 @@ class YoukuPlayback extends IVideoPlayback {
   play(): void {
     this.player.playVideo();
   }
+
+  pause(): void {
+    this.player.pauseVideo();
+  }
+
+  seekTo(sec: number): void {
+    this.player.seekTo(sec);
+  }
 }
 
 module.exports = YoukuPlayback;

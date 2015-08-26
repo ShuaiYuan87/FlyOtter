@@ -15,6 +15,7 @@ var VideoPlayer = React.createClass({
   getInitialState: function(): Object {
     return {
       videoURL: '',
+      playerSec: 0,
     };
   },
 
@@ -30,6 +31,13 @@ var VideoPlayer = React.createClass({
 
         <button onClick={this._loadVideo}>Load</button>
         <button onClick={this._playVideo}>Play</button>
+        <button onClick={this._pauseVideo}>Pause</button>
+        <input
+          type="text"
+          value={this.state.playerSec}
+          onChange={evt => this.setState({playerSec: parseInt(evt.target.value)})}
+        />
+        <button onClick={this._seekVideo}>Seek</button>
         <div style={styles.fullsizePlayer} id={VIDEO_PLAYER_ID}/>
       </div>
     );
@@ -42,7 +50,15 @@ var VideoPlayer = React.createClass({
 
   _playVideo: function(evt: Object): void {
     PlaybackControl.getControl().play();
-  }
+  },
+
+  _pauseVideo: function(evt: Object): void {
+    PlaybackControl.getControl().pause();
+  },
+
+  _seekVideo: function(evt: Object): void {
+    PlaybackControl.getControl().seekTo(this.state.playerSec);
+  },
 });
 
 var styles = StyleSheet.create({

@@ -10,6 +10,7 @@ var IVideoPlayback = require('../VideoPlayback/IVideoPlayback');
 class IVideoLoader {
   // event that's fired when the video loader has all scripts initialized
   videoScriptReady: () => void;
+  videoPlayerReady: () => void;
 
   // Event handlers for script loader
   onScriptLoaded(): void {}
@@ -30,6 +31,10 @@ class IVideoLoader {
   loadVideo: (htmlElementID: string, videoID: string) => IVideoPlayback;
 
   clearVideo(htmlElementID: string): void {}
+
+  onVideoPlayerReady(): void {
+    this.videoPlayerReady && this.videoPlayerReady();
+  }
 }
 
 module.exports = IVideoLoader;
