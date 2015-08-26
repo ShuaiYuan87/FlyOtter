@@ -22,6 +22,14 @@ class YoukuPlayback extends IVideoPlayback {
   seekTo(sec: number): void {
     this.player.seekTo(sec);
   }
+
+  getCurrentTime(): number {
+    try {
+      return parseInt(this.player.currentTime());
+    } catch(e) {
+      return 0;
+    }
+  }
 }
 
 module.exports = YoukuPlayback;

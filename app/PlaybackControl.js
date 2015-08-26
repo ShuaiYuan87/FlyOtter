@@ -37,6 +37,8 @@ class PlaybackControl {
   // instance variables / methods
   videoPlayback: IVideoPlayback;
   isVideoPlayerReady: boolean;
+  timer: any;
+  playerTick: (sec: number) => void;
 
   loadVideo(htmlElementID: string, url: string): PlaybackControl {
     var loader = this._findLoader(url);
@@ -69,9 +71,6 @@ class PlaybackControl {
 
     return this;
   }
-
-  // Video playback callbacks
-  videoPlayerReady: () => void;
 
   // Video playback Operations
   play(): PlaybackControl {
@@ -114,11 +113,14 @@ class PlaybackControl {
     // Replace the iframe element with a div
     var iframeElement = document.getElementById(htmlElementID);
     var style = iframeElement.getAttribute('style');
-    this.isVideoPlayerReady = false;
-    loader.videoPlayerReady = () => {
-      this.videoPlayerReady && this.videoPlayerReady();
-      this.isVideoPlayerReady = true;
+
+    // clear the timer and set the tick to 0
+    if (this.timer) {
+      this.playerTick && this.playerTick(0);
+      clearInterval(this.timer);
+      this.timer = null;
     }
+    loader.videoPlayerReady = this._onVideoPlayerReady.bind(this);
     var playback = loader.loadVideo(htmlElementID, loader.parseVideoID(url));
     document.getElementById(htmlElementID).setAttribute('style', style);
     return playback;
@@ -131,6 +133,16 @@ class PlaybackControl {
     var style = iframeElement.getAttribute('style');
     loader.clearVideo(htmlElementID);
     document.getElementById(htmlElementID).setAttribute('style', style);
+  }
+
+  _onVideoPlayerReady(): void {
+    this.timer = setInterval(
+      function() {
+        var time = this.videoPlayback ? this.videoPlayback.getCurrentTime() : 0;
+        this.playerTick && this.playerTick(time);
+      }.bind(this),
+      500
+    );
   }
 }
 
