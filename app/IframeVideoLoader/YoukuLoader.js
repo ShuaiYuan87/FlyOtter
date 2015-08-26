@@ -24,10 +24,8 @@ class YoukuLoader extends IVideoLoader {
       styleid: '7',
       client_id: '716d2b2fc5573842',
       vid: videoID,
-      events: {
-        onPlayerReady: super.onVideoPlayerReady(),
-      }
     });
+    super.onVideoPlayerReady();
     return new YoukuPlayback(player);
   }
 

@@ -12,15 +12,21 @@ class YoukuPlayback extends IVideoPlayback {
   }
 
   play(): void {
-    this.player.playVideo();
+    try {
+      this.player.playVideo();
+    } catch(e) {}
   }
 
   pause(): void {
+    try {
     this.player.pauseVideo();
+    } catch(e) {}
   }
 
   seekTo(sec: number): void {
-    this.player.seekTo(sec);
+    try {
+      this.player.seekTo(sec);
+    } catch(e) {}
   }
 
   getCurrentTime(): number {
