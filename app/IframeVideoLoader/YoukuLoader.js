@@ -25,7 +25,11 @@ class YoukuLoader extends IVideoLoader {
       client_id: '716d2b2fc5573842',
       vid: videoID,
     });
-    super.onVideoPlayerReady();
+    // This is hacky: we used to call the youku api too
+    // soon to get current time, and that somehow broke the youku
+    // object. So here, we sleep for a certain period just so
+    // current time is not called too soon
+    setTimeout(() => super.onVideoPlayerReady(), 3000);
     return new YoukuPlayback(player);
   }
 

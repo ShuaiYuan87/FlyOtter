@@ -4,7 +4,8 @@
 
 var ReactScriptLoader = require('./ReactScriptLoader.js').ReactScriptLoader;
 var IVideoLoader = require('./IframeVideoLoader/IVideoLoader');
-var IVideoPlayback = require('./VideoPlayback/IVideoPlayback')
+var IVideoPlayback = require('./VideoPlayback/IVideoPlayback');
+var PlayerState = require('./PlayerState');
 var YoukuLoader = require('./IframeVideoLoader/YoukuLoader');
 var YoutubeLoader = require('./IframeVideoLoader/YoutubeLoader');
 
@@ -38,6 +39,7 @@ class PlaybackControl {
   videoPlayback: IVideoPlayback;
   isVideoPlayerReady: boolean;
   timer: any;
+  playerState: string;
   playerTick: (sec: number) => void;
 
   loadVideo(htmlElementID: string, url: string): PlaybackControl {
@@ -75,12 +77,23 @@ class PlaybackControl {
   // Video playback Operations
   play(): PlaybackControl {
     this.videoPlayback.play();
+    this.playerState = PlayerState.PLAYING;
     return this;
   }
 
   pause(): PlaybackControl {
     this.videoPlayback.pause();
+    this.playerState = PlayerState.PAUSED;
     return this;
+  }
+
+  toggle(): PlaybackControl {
+    if (this.playerState === PlayerState.PLAYING) {
+      return this.pause();
+    } else if (this.playerState === PlayerState.PAUSED) {
+      return this.play();
+    }
+    invariant(false, 'Toggling a player with unknown state.');
   }
 
   seekTo(sec: number): PlaybackControl {
@@ -114,12 +127,6 @@ class PlaybackControl {
     var iframeElement = document.getElementById(htmlElementID);
     var style = iframeElement.getAttribute('style');
 
-    // clear the timer and set the tick to 0
-    if (this.timer) {
-      this.playerTick && this.playerTick(0);
-      clearInterval(this.timer);
-      this.timer = null;
-    }
     loader.videoPlayerReady = this._onVideoPlayerReady.bind(this);
     var playback = loader.loadVideo(htmlElementID, loader.parseVideoID(url));
     document.getElementById(htmlElementID).setAttribute('style', style);
@@ -136,6 +143,14 @@ class PlaybackControl {
   }
 
   _onVideoPlayerReady(): void {
+    this.playerState = PlayerState.PAUSED;
+
+    // clear the timer and set the tick to 0
+    if (this.timer) {
+      this.playerTick && this.playerTick(0);
+      clearInterval(this.timer);
+      this.timer = null;
+    }
     this.timer = setInterval(
       function() {
         var time = this.videoPlayback ? this.videoPlayback.getCurrentTime() : 0;
