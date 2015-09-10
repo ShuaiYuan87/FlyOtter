@@ -42,6 +42,11 @@ class YoutubeLoader extends IVideoLoader {
 
     this.player = new YT.Player(htmlElementID, {
       videoId: videoID,
+      playerVars: {
+        controls: 0,
+        showinfo: 0,
+        rel: 0,
+      },
     });
     super.onVideoPlayerReady();
     return new YoutubePlayback(this.player);
