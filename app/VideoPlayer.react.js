@@ -8,7 +8,7 @@
 var PlaybackControl = require('./PlaybackControl');
 var React = require('react');
 var RemotePlaybackControl = require('./RemotePlaybackControl');
-var StyleSheet = require('react-style')
+  var StyleSheet = require('react-style');
 
 var VIDEO_PLAYER_ID = 'keekwoon-player';
 //var serverIP = '73.231.32.235';
