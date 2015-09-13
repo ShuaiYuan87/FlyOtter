@@ -5,10 +5,11 @@
 
 'use strict';
 
+var Icon = require('Icons/Icon.react');
 var PlaybackControl = require('./PlaybackControl');
 var React = require('react');
 var RemotePlaybackControl = require('./RemotePlaybackControl');
-  var StyleSheet = require('react-style');
+var StyleSheet = require('react-style');
 
 var VIDEO_PLAYER_ID = 'keekwoon-player';
 //var serverIP = '73.231.32.235';
@@ -25,7 +26,6 @@ var VideoPlayer = React.createClass({
     );
 
     remote.onLoadVideo = (videoURL) => {
-      console.log('onload video')
       this.setState({
         videoURL: videoURL,
       });
@@ -54,6 +54,7 @@ var VideoPlayer = React.createClass({
             videoURL: evt.target.value
         })} />
 
+        <Icon icon="my-icon"/>
         <button onClick={this._loadVideo}>Load</button>
         <button onClick={this._playVideo}>Play</button>
         <button onClick={this._pauseVideo}>Pause</button>
