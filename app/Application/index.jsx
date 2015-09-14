@@ -5,15 +5,19 @@
 
 'use strict';
 
+var Arbiter = require('arbiter-subpub');
 var Icon = require('../Icons/Icon.react');
 var React = require("react");
 var RouteHandler = require("react-router").RouteHandler;
 var StyleSheet = require('react-style');
 
 var Application = React.createClass({
+
+
 	getInitialState(): Object {
 		return {
 			isButtonDown: false,
+			videoURL: '',
 		};
 	},
 
@@ -33,9 +37,15 @@ var Application = React.createClass({
 						<input
 							style={styles.videoInput}
 							placeholder='enter video url here'
+							onChange={evt => this.setState({
+		            videoURL: evt.target.value
+							})}
 						/>
 						<span
 							style={style}
+							onClick={() => {
+							  Arbiter.publish("video/load", {url: this.state.videoURL});
+							}}
 							onMouseDown={() => {
 								this.setState({isButtonDown: true});
 							}}

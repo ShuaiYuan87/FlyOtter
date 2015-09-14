@@ -5,6 +5,7 @@
 
 'use strict';
 
+var Arbiter = require('arbiter-subpub');
 var Icon = require('Icons/Icon.react');
 var PlaybackControl = require('./PlaybackControl');
 var React = require('react');
@@ -18,6 +19,12 @@ var PORT = 8989;
 var ROOM_ID = 1234;
 
 var VideoPlayer = React.createClass({
+  componentDidMount: function(): void {
+    Arbiter.subscribe('video/load', (data) => {
+      this._loadVideo(data.url);
+    });
+  },
+
   getInitialState: function(): Object {
     var remote = new RemotePlaybackControl(
       HOST,
@@ -52,10 +59,15 @@ var VideoPlayer = React.createClass({
           value={this.state.videoURL}
           onChange={evt => this.setState({
             videoURL: evt.target.value
-        })} />
+        })}/>
 
         <Icon icon="my-icon"/>
-        <button onClick={this._loadVideo}>Load</button>
+        <button onClick={() => {
+          debugger;
+          emitter.emit('loadVideo', this.state.videoURL);
+        }}>
+          Load
+        </button>
         <button onClick={this._playVideo}>Play</button>
         <button onClick={this._pauseVideo}>Pause</button>
         <input
@@ -87,10 +99,10 @@ var VideoPlayer = React.createClass({
     PlaybackControl.getControl().toggle();
   },
 
-  _loadVideo: function(evt: Object): void {
+  _loadVideo: function(url: string): void {
     var playbackControl = PlaybackControl.getControl();
-    this.state.remotePlaybackControl.loadVideo(this.state.videoURL);
-    playbackControl.loadVideo(VIDEO_PLAYER_ID, this.state.videoURL);
+    this.state.remotePlaybackControl.loadVideo(url);
+    playbackControl.loadVideo(VIDEO_PLAYER_ID, url);
     playbackControl.playerTick = (time) => this.setState({currentTime: time});
   },
 
