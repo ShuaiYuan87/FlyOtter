@@ -42,9 +42,13 @@ class RemotePlaybackControl {
           return;
         }
 
-        switch(data.msgType) {
-        case Protocol.ACTION:
+        switch(data.playerAction) {
+        case Protocol.PLAY:
+        case Protocol.PAUSE:
           this.onPlay && this.onPlay();
+          break;
+        case Protocol.SEEK:
+          this.onSeek && this.onSeek(data.playerTime);
           break;
         }
         return;
@@ -86,6 +90,16 @@ class RemotePlaybackControl {
 
   toggle(): void {
     this.play();
+  }
+
+  seekTo(time: number): void {
+    var message = Protocol.createMessage(
+      false,
+      this.clientID,
+      time,
+      Protocol.SEEK
+    );
+    this.socket.emit('postData', JSON.stringify(message));
   }
 
   disconnect(): void {

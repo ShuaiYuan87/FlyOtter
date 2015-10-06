@@ -17,7 +17,7 @@ var Application = React.createClass({
 	getInitialState(): Object {
 		return {
 			isButtonDown: false,
-			videoURL: '',
+			videoURL: 'https://www.youtube.com/watch?v=bdcnB3A9r7I',
 		};
 	},
 
@@ -40,7 +40,8 @@ var Application = React.createClass({
 							onChange={evt => this.setState({
 		            videoURL: evt.target.value
 							})}
-						/>
+							value={this.state.videoURL}
+						>  </input>
 						<span
 							style={style}
 							onClick={() => {

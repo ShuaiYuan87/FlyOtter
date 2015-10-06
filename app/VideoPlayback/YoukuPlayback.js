@@ -36,6 +36,10 @@ class YoukuPlayback extends IVideoPlayback {
       return 0;
     }
   }
+
+  getTotalTime(): number {
+    return parseInt(this.player.totalTime(), 10);
+  }
 }
 
 module.exports = YoukuPlayback;
