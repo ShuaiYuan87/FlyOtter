@@ -13,6 +13,7 @@ class IVideoPlayback {
 
   // info
   getCurrentTime: () => number;
+  getTotalTime:() => number;
 }
 
 module.exports = IVideoPlayback;

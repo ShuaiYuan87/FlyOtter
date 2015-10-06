@@ -26,6 +26,10 @@ class YoutubePlayback extends IVideoPlayback {
   getCurrentTime(): number {
     return this.player.getCurrentTime ? this.player.getCurrentTime() : 0;
   }
+
+  getTotalTime(): number {
+    return this.player.getDuration();
+  }
 }
 
 module.exports = YoutubePlayback;

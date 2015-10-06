@@ -101,6 +101,13 @@ class PlaybackControl {
     return this;
   }
 
+  getTotalTime(): number {
+    var totalTime = this.videoPlayback && this.videoPlayback.getTotalTime
+      ? this.videoPlayback.getTotalTime()
+      : 0;
+    return totalTime;
+  }
+
   _findLoader(videoUrl: string): IVideoLoader {
     var loaders = PlaybackControl.configLoaders().map(
       loader =>

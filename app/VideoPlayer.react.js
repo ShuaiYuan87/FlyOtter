@@ -6,6 +6,7 @@
 'use strict';
 
 var Arbiter = require('arbiter-subpub');
+var ControlPane = require('ControlPane.react');
 var Icon = require('Icons/Icon.react');
 var PlaybackControl = require('./PlaybackControl');
 var React = require('react');
@@ -37,10 +38,15 @@ var VideoPlayer = React.createClass({
         videoURL: videoURL,
       });
       PlaybackControl.getControl().loadVideo(VIDEO_PLAYER_ID, videoURL);
+      PlaybackControl.getControl().playerTick =
+        (time) => this.setState({currentTime: time});
     };
     remote.onPlay = () => {
       PlaybackControl.getControl().toggle();
     };
+    remote.onSeek = (time) => {
+      PlaybackControl.getControl().seekTo(time);
+    }
 
     return {
       videoURL: '',
@@ -52,6 +58,11 @@ var VideoPlayer = React.createClass({
   },
 
   render: function(): Object {
+    var control = PlaybackControl.getControl();
+    var totalTime = control.getTotalTime
+      ? control.getTotalTime()
+      : 0;
+
     return (
       <div style={{height: 700}}>
         <input
@@ -88,10 +99,27 @@ var VideoPlayer = React.createClass({
             ]}
             onClick={this._togglePlayerState}
           >
+            <ControlPane
+              currentTime={this.state.currentTime}
+              totalTime={totalTime}
+              handleProgressChange={this._handleProgressChange}
+            />
           </div>
         </div>
       </div>
     );
+  },
+
+  _handleProgressChange: function (percent: number): void {
+    var playbackControl = PlaybackControl.getControl();
+    if (playbackControl) {
+      var time = percent * playbackControl.getTotalTime() / 100
+      playbackControl.seekTo(time);
+      this.setState({
+        currentTime: time,
+      });
+      this.state.remotePlaybackControl.seekTo(time);
+    }
   },
 
   _togglePlayerState: function(): void {
@@ -136,7 +164,7 @@ var styles = StyleSheet.create({
     WebkitFlex: 1, /* Safari 6.1+ */
     msFlex: 1, /* IE 10 */
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   videoContainer: {
     width: '100%',
