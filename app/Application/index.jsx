@@ -58,6 +58,7 @@ var Application = React.createClass({
 					</span>
 				</div>
 				<RouteHandler />
+				
 			</div>
 		);
 	},
@@ -69,11 +70,11 @@ var styles = StyleSheet.create({
 		backgroundColor: 'rgb(38, 38, 38)',
 		display: 'flex',
 		flexDirection: 'row',
-    alignItems: 'center',
-    WebkitFlex: 1, /* Safari 6.1+ */
-    msFlex: 1, /* IE 10 */
-    flex: 1,
-    justifyContent: 'center',
+	    alignItems: 'flex-end',
+	    WebkitFlex: 1, /* Safari 6.1+ */
+	    msFlex: 1, /* IE 10 */
+	    flex: 1,
+	    justifyContent: 'center',
 	},
 	logo: {
 		color: 'rgb(195, 195, 195)',

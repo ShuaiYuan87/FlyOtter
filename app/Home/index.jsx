@@ -11,8 +11,10 @@ var YoukuWrapper = require('../youku.js');
 
 module.exports = React.createClass({
 	render: function() {
-		return <div>
-			<YoukuWrapper width='70%' height='700px' className={'center'}/>
-		</div>;
+		return <body>
+                    <header class="intro">
+                        <div>A free, responsive, one page Bootstrap theme.reated by Start Bootstrap.</div>
+                    </header>
+		        </body>
 	}
 });

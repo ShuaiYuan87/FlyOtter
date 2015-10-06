@@ -3,7 +3,8 @@ var State = require("react-router").State;
 var Link = require("react-router").Link;
 var StateFromStoreMixin = require("items-store/StateFromStoresMixin");
 var Todo = require("../actions").Todo;
-
+var StyleSheet = require('react-style');
+require("../Home/style.css");
 var TodoList = React.createClass({
 	mixins: [State, StateFromStoreMixin],
 	statics: {
@@ -31,15 +32,19 @@ var TodoList = React.createClass({
 		var list = this.state.list;
 		var items = this.state.items;
 		var info = this.state.info;
-		return <div>
-			<h2>Todolist</h2>
-			<Link to="home">Home</Link>
-			{
-				info.error ? <div><strong>{info.error.message}</strong></div> :
-				info.available ? this.renderItemsView(id, list, items) :
-				<div>Fetching from server...</div>
-			}
-		</div>;
+		return <body>
+                    <header className="intro">
+                        <div styles={[
+			              styles.overlay,
+			              styles.canvas,
+			            ]}><p className="intro-text">
+                        Share the video with your loved family and friends.</p>
+                        <p className="intro-text">brought to you by KK</p>
+                        </div>
+                    </header>
+		        </body>
+			
+		
 	},
 	renderItemsView: function(id, list, items) {
 		return <ul>
@@ -72,3 +77,16 @@ var TodoList = React.createClass({
 	}
 });
 module.exports = TodoList;
+var styles = StyleSheet.create({
+  
+  canvas: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    WebkitFlex: 1, /* Safari 6.1+ */
+    msFlex: 1, /* IE 10 */
+    flex: 1,
+    justifyContent: 'center',
+  },
+  
+});

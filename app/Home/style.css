@@ -1,5 +1,18 @@
-body {
-    background: white;
+
+
+.intro {
+    display: table;
+    width: 100%;
+    height: auto;
+    padding: 100px 0;
+    text-align: center;
+    color: #fff;
+    background: url("intro-bg.jpg"); 
+    background-color: #000;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
 }
 
 .center {
@@ -8,4 +21,8 @@ body {
     width: 80%;
     margin-top:20px;
  }
+
+.intro-text {
+    font-size: 80px;
+}
 
