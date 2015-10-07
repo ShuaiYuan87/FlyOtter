@@ -6,8 +6,9 @@
 'use strict';
 
 var Arbiter = require('arbiter-subpub');
-var ControlPane = require('ControlPane.react');
-var Icon = require('Icons/Icon.react');
+var Chathead = require('./Chathead.react');
+var ControlPane = require('./ControlPane.react');
+var Icon = require('./Icons/Icon.react');
 var PlaybackControl = require('./PlaybackControl');
 var React = require('react');
 var RemotePlaybackControl = require('./RemotePlaybackControl');
@@ -99,6 +100,7 @@ var VideoPlayer = React.createClass({
             ]}
             onClick={this._togglePlayerState}
           >
+            <Chathead />
             <ControlPane
               currentTime={this.state.currentTime}
               totalTime={totalTime}
