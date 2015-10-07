@@ -71,7 +71,7 @@ var styles = StyleSheet.create({
 		backgroundColor: 'rgb(38, 38, 38)',
 		display: 'flex',
 		flexDirection: 'row',
-	    alignItems: 'flex-end',
+	    alignItems: 'center',
 	    WebkitFlex: 1, /* Safari 6.1+ */
 	    msFlex: 1, /* IE 10 */
 	    flex: 1,
