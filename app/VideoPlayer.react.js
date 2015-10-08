@@ -7,6 +7,7 @@
 
 var Arbiter = require('arbiter-subpub');
 var Chathead = require('./Chathead.react');
+var ChatPane = require('./ChatPane.react');
 var ControlPane = require('./ControlPane.react');
 var Icon = require('./Icons/Icon.react');
 var PlaybackControl = require('./PlaybackControl');
@@ -55,6 +56,8 @@ var VideoPlayer = React.createClass({
       currentTime: 0,
       isControlPanelVisible: false,
       remotePlaybackControl: remote,
+      text: '',
+      chatheads: [],
     };
   },
 
@@ -68,17 +71,22 @@ var VideoPlayer = React.createClass({
       <div style={{height: 700}}>
         <input
           type="text"
-          value={this.state.videoURL}
+          value={this.state.text}
           onChange={evt => this.setState({
-            videoURL: evt.target.value
+            text: evt.target.value
         })}/>
 
         <Icon icon="my-icon"/>
         <button onClick={() => {
-          debugger;
-          emitter.emit('loadVideo', this.state.videoURL);
+          var chatheads = this.state.chatheads;
+          chatheads.push(
+            <Chathead text={this.state.text} />
+          );
+          this.setState({
+            chatheads: chatheads,
+          })
         }}>
-          Load
+          add chat
         </button>
         <button onClick={this._playVideo}>Play</button>
         <button onClick={this._pauseVideo}>Pause</button>
@@ -100,7 +108,9 @@ var VideoPlayer = React.createClass({
             ]}
             onClick={this._togglePlayerState}
           >
-            <Chathead />
+            <ChatPane>
+              {this.state.chatheads}
+            </ChatPane>
             <ControlPane
               currentTime={this.state.currentTime}
               totalTime={totalTime}

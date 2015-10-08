@@ -9,14 +9,17 @@ var Progress = require('react-progressbar');
 var React = require('react');
 var StyleSheet = require('react-style');
 
+var {PropTypes} = React;
+
 var Chathead = React.createClass({
   propTypes: {
+    text: PropTypes.string.isRequired,
   },
 
   render(): Object {
     return (
       <div style={styles.message}>
-        message hello world and more more more more more more more lines lines
+        {this.props.text}
         <div style={styles.arrow} />
         <img
           style={styles.head}
@@ -29,34 +32,39 @@ var Chathead = React.createClass({
 var styles = StyleSheet.create({
   message: {
     borderColor: 'rgb(127, 127, 127)',
-    width: '210px',
-    height: '80px',
+    color: 'rgba(240, 240, 250, 1)',
+    borderWidth: '3px',
+    width: '220px',
+    minHeight: '40px',
+    maxHeight: '120px',
     position: 'relative',
     borderRadius: '16px',
-    backgroundColor: 'rgb(255, 255, 255)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     padding: '10px',
+    marginLeft: '80px',
   },
 
   arrow: {
     content: '',
     position: 'absolute',
     borderStyle: 'solid',
-    borderWidth: '15px 15px 15px 0',
-    borderColor: 'transparent #FFFFFF',
+    borderWidth: '8px 8px 8px 0',
+    borderColor: 'transparent rgba(0, 0, 0, 0.6)',
     display: 'block',
     width: 0,
     zIndex: 1,
-    left: '-15px',
-    top: '50%',
+    left: '-8px',
+    top: '20%',
   },
+
   head: {
-    top: '40%',
+    top: '10%',
     borderRadius: '50%',
     height: '50px',
     width: '50px',
     position: 'absolute',
     display: 'block',
-    left: '-80px',
+    left: '-65px',
   }
 });
 
