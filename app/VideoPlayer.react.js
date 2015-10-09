@@ -48,7 +48,10 @@ var VideoPlayer = React.createClass({
     };
     remote.onSeek = (time) => {
       PlaybackControl.getControl().seekTo(time);
-    }
+    };
+    remote.onReceiveMessage = (text) => {
+      this._addMessage(text);
+    };
 
     return {
       videoURL: '',
@@ -59,6 +62,16 @@ var VideoPlayer = React.createClass({
       text: '',
       chatheads: [],
     };
+  },
+
+  _addMessage(message: string): void {
+    var chatheads = this.state.chatheads;
+    chatheads.push(
+      <Chathead text={message} />
+    );
+    this.setState({
+      chatheads: chatheads,
+    })
   },
 
   render: function(): Object {
@@ -78,13 +91,8 @@ var VideoPlayer = React.createClass({
 
         <Icon icon="my-icon"/>
         <button onClick={() => {
-          var chatheads = this.state.chatheads;
-          chatheads.push(
-            <Chathead text={this.state.text} />
-          );
-          this.setState({
-            chatheads: chatheads,
-          })
+          this.state.remotePlaybackControl.sendChat(this.state.text, -356);
+          this._addMessage(this.state.text);
         }}>
           add chat
         </button>
@@ -125,7 +133,7 @@ var VideoPlayer = React.createClass({
   _handleProgressChange: function (percent: number): void {
     var playbackControl = PlaybackControl.getControl();
     if (playbackControl) {
-      var time = percent * playbackControl.getTotalTime() / 100
+      var time = percent * playbackControl.getTotalTime() / 100;
       playbackControl.seekTo(time);
       this.setState({
         currentTime: time,

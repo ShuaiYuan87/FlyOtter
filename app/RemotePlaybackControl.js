@@ -11,6 +11,7 @@ class RemotePlaybackControl {
   onPlay: () => void;
   onLoadVideo: (videoURL: string) => void;
   onSeek: (sec: number) => void;
+  onReceiveMessage: (text: string) => void;
 
   socket: any;
   roomID: number;
@@ -50,6 +51,8 @@ class RemotePlaybackControl {
         case Protocol.SEEK:
           this.onSeek && this.onSeek(data.playerTime);
           break;
+        case Protocol.CHAT:
+          this.onReceiveMessage && this.onReceiveMessage(data.text);
         }
         return;
       }
@@ -99,6 +102,17 @@ class RemotePlaybackControl {
       time,
       Protocol.SEEK
     );
+    this.socket.emit('postData', JSON.stringify(message));
+  }
+
+  sendChat(text: string, time: number): void {
+    var message = Protocol.createMessage(
+      false,
+      this.clientID,
+      time,
+      Protocol.CHAT
+    );
+    message.text = text;
     this.socket.emit('postData', JSON.stringify(message));
   }
 

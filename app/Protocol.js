@@ -15,6 +15,7 @@ class Protocol {
   static SEEK: number;
   static STOP: number;
   static RELOAD: number;
+  static CHAT: number;
 
   // Operations
   static CREATE_ROOM: string;
@@ -59,6 +60,7 @@ Object.assign(
     SEEK: 3,
     STOP: 4,
     RELOAD: 5,
+    CHAT: 6,
 
     CREATE_ROOM: 'create',
     LOAD_VIDEO: 'reload',
