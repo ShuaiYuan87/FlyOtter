@@ -81,7 +81,26 @@ var VideoPlayer = React.createClass({
       : 0;
 
     return (
-      <div style={{height: 700}}>
+      <div style={styles.screen}>
+        <div style={styles.videoContainer}>
+          <div style={styles.overlay} id={VIDEO_PLAYER_ID}/>
+          <div
+            styles={[
+              styles.overlay,
+              styles.canvas,
+            ]}
+            onClick={this._togglePlayerState}
+          >
+            <ChatPane>
+              {this.state.chatheads}
+            </ChatPane>
+            <ControlPane
+              currentTime={this.state.currentTime}
+              totalTime={totalTime}
+              handleProgressChange={this._handleProgressChange}
+            />
+          </div>
+        </div>
         <input
           type="text"
           value={this.state.text}
@@ -107,25 +126,6 @@ var VideoPlayer = React.createClass({
         />
         <button onClick={this._seekVideo}>Seek</button>
         <div> {this.state.currentTime} </div>
-        <div style={styles.videoContainer}>
-          <div style={styles.overlay} id={VIDEO_PLAYER_ID}/>
-          <div
-            styles={[
-              styles.overlay,
-              styles.canvas,
-            ]}
-            onClick={this._togglePlayerState}
-          >
-            <ChatPane>
-              {this.state.chatheads}
-            </ChatPane>
-            <ControlPane
-              currentTime={this.state.currentTime}
-              totalTime={totalTime}
-              handleProgressChange={this._handleProgressChange}
-            />
-          </div>
-        </div>
       </div>
     );
   },
@@ -188,9 +188,14 @@ var styles = StyleSheet.create({
   },
   videoContainer: {
     width: '100%',
-    height: '700px',
+    height: '700',
     position: 'relative',
   },
+  screen: {
+    padding: '20px 20px',
+    background: 'black',
+    height: '100%',
+  }
 });
 
 module.exports = VideoPlayer;

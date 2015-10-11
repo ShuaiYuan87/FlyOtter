@@ -6,10 +6,15 @@
 'use strict';
 
 var Arbiter = require('arbiter-subpub');
+var Button = require('react-button');
 var Icon = require('../Icons/Icon.react');
+var LoginWindow = require('../Accounts/LoginWindow.react');
 var React = require("react");
 var RouteHandler = require("react-router").RouteHandler;
+var SignupWindow = require('../Accounts/SignupWindow.react');
 var StyleSheet = require('react-style');
+
+var {ModalContainer, ModalDialog} = require('react-modal-dialog');
 
 var Application = React.createClass({
 
@@ -18,6 +23,8 @@ var Application = React.createClass({
 		return {
 			isButtonDown: false,
 			videoURL: 'https://www.youtube.com/watch?v=bdcnB3A9r7I',
+			showLoginWindow: false,
+			isSigningup: false,
 		};
 	},
 
@@ -57,11 +64,43 @@ var Application = React.createClass({
 							/>
 						</span>
 					</span>
+					<span style={styles.loginSection}>
+						<Button
+							style={styles.loginButton}
+							theme={styles.loginButtontheme}
+							onClick={() => this.setState({showLoginWindow: true})}>
+							<Icon icon='account-circle' style={{marginRight: 5}}/>
+							sign in
+							{
+								this._getSignupOrLoginWindow()
+							}
+						</Button>
+					</span>
 				</div>
 				<RouteHandler />
-				
+
 			</div>
 		);
+	},
+
+	_getSignupOrLoginWindow(): any {
+		var accountWindow = !this.state.isSigningup
+			? (
+				<LoginWindow
+					onSignupRequest={() => this.setState({isSigningup: true})}
+				/>
+			) : <SignupWindow />;
+
+		return this.state.showLoginWindow
+			? (
+				<ModalContainer
+					onClose={() => this.setState({showLoginWindow: false})}>
+					<ModalDialog
+						onClose={() => {}}>
+						{accountWindow}
+					</ModalDialog>
+				</ModalContainer>
+			) : null;
 	},
 });
 
@@ -101,6 +140,25 @@ var styles = StyleSheet.create({
 		width: '500px',
 		height: '28px',
 		fontSize: '16px',
+	},
+	loginSection: {
+		marginLeft: 20,
+		padding: 0,
+		display: 'inline-block',
+	},
+	loginButton: {
+		padding: '5px 15px',
+	},
+	loginButtontheme: {
+		style: {
+			color: 'white',
+			borderWidth: 0,
+			borderRadius: '10px',
+		},
+    overStyle: {
+			background: 'rgba(255, 255, 255, 0.5)',
+		},
+  	activeStyle: { background: 'rgba(255, 255, 255, 0.3)'},
 	},
 });
 

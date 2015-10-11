@@ -29,6 +29,8 @@ last_server_time = Date.now();
 
 var owner_map = {};
 
+var videoUrlByRoomID = {};
+
 function sendMessage(message, room, type, owner_only) {
 
     var msg_id = Math.floor(Math.random() * 10000);
@@ -51,7 +53,7 @@ function sendMessage(message, room, type, owner_only) {
 }
 function sleepFor( sleepDuration ){
     var now = new Date().getTime();
-    while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+    while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
 }
 io.on('connection', function(socket){
     console.log('a user connected');
@@ -84,7 +86,7 @@ io.on('connection', function(socket){
         // ack latency check
         else if (msgType == msg.MsgType.ACK) {
             latency[data.clientId] = (Date.now()-data.timestamp)/2;
-        }        
+        }
     });
     socket.on('reload', function (data) {
         console.error('received reload message ' + data);
@@ -120,7 +122,7 @@ io.on('connection', function(socket){
             io.sockets.emit('system', nickname, users.length, 'login');
         };
     });
-    
+
     //new message get
     socket.on('postMsg', function(msg, color) {
         socket.broadcast.emit('newMsg', socket.nickname, msg, color);
@@ -138,4 +140,3 @@ io.on('connection', function(socket){
     };
  //   sendMessage(message);
 }, 300000);*/
-
