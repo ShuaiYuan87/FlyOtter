@@ -26,11 +26,12 @@ var Input = React.createClass({
   render(): ?Object {
     var {style} = this.props;
     var inputStyle = merge(
+      {},
       styles.input,
       this.state.focus ? styles.inputFocus : {}
     );
     return (
-      <div style={merge(styles.container, style)}>
+      <div style={merge({}, styles.container, style)}>
         <label style={styles.label}> {this.props.label} </label>
         <input
           style={inputStyle}
