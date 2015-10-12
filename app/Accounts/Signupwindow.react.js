@@ -7,10 +7,28 @@
 
 var Button = require('react-button');
 var Input = require('../Controls/Input.react');
+var LinkedStateMixin = require('react-addons-linked-state-mixin');
+var ParseFactory = require('../ParseFactory');
 var React = require('react');
 var StyleSheet = require('react-style');
 
+
 var SignupWindow = React.createClass({
+  mixins: [LinkedStateMixin],
+
+  propTypes: {
+    onSignupSuccess: React.PropTypes.func.isRequired,
+  },
+
+  getInitialState(): Object {
+    return {
+      email: '',
+      password: '',
+      passwordConfirm: '',
+      name: '',
+    };
+  },
+
   render(): ?Object {
     return (
       <div style={styles.dialogContainer}>
@@ -18,23 +36,54 @@ var SignupWindow = React.createClass({
         <Input
           style={styles.inputRow}
           label='Email'
-          placeholder="Email address"/>
+          placeholder="Email address"
+          valueLink = {this.linkState('email')}
+          />
         <Input
           style={styles.inputRow}
           label='Password'
-          placeholder="Password" />
+          placeholder="Password"
+          valueLink = {this.linkState('password')}
+          />
         <Input
           style={styles.inputRow}
           label='Confirm'
-          placeholder="Enter password again" />
+          placeholder="Enter password again"
+          valueLink = {this.linkState('passwordConfirm')}
+          />
         <Input
           style={styles.inputRow}
           label='Name'
-          placeholder="Name or nickname" />
-        <Button style={styles.signupButton}> Sign up </Button>
+          placeholder="Name or nickname"
+          valueLink = {this.linkState('name')}
+          />
+        <Button
+          style={styles.signupButton}
+          onClick={this._onSignup}>
+          Sign up
+        </Button>
       </div>
     )
-  }
+  },
+
+  _onSignup(): void {
+    var user = ParseFactory.getObjectByType('User');
+    user.set("username", this.state.name);
+    user.set("password", this.state.password);
+    user.set("email", this.state.email);
+
+//    user.set("phone", "650-555-0001");
+
+    user.signUp(null, {
+      success: user => {
+        this.props.onSignupSuccess();
+      },
+      error: (user, error) => {
+        // Show the error message somewhere and let the user try again.
+        alert("Error: " + error.code + " " + error.message);
+      },
+    });
+  },
 });
 
 var styles = StyleSheet.create({

@@ -9,6 +9,7 @@ var Arbiter = require('arbiter-subpub');
 var Button = require('react-button');
 var Icon = require('../Icons/Icon.react');
 var LoginWindow = require('../Accounts/LoginWindow.react');
+var ParseFactory = require('../ParseFactory');
 var React = require("react");
 var RouteHandler = require("react-router").RouteHandler;
 var SignupWindow = require('../Accounts/SignupWindow.react');
@@ -17,15 +18,23 @@ var StyleSheet = require('react-style');
 var {ModalContainer, ModalDialog} = require('react-modal-dialog');
 
 var Application = React.createClass({
-
-
 	getInitialState(): Object {
 		return {
 			isButtonDown: false,
 			videoURL: 'https://www.youtube.com/watch?v=bdcnB3A9r7I',
 			showLoginWindow: false,
 			isSigningup: false,
+			username: this._getLoginName(),
 		};
+	},
+
+	_getLoginName(): ?string {
+		// var Parse = ParseFactory.getParse();
+		// var currentUser = Parse.User.current();
+		// if (currentUser) {
+		// 	return currentUser.get('username');
+		// }
+		return null;
 	},
 
 	render: function(): Object {
@@ -70,7 +79,7 @@ var Application = React.createClass({
 							theme={styles.loginButtontheme}
 							onClick={() => this.setState({showLoginWindow: true})}>
 							<Icon icon='account-circle' style={{marginRight: 5}}/>
-							sign in
+							{this.state.username || 'sign in'}
 							{
 								this._getSignupOrLoginWindow()
 							}
@@ -88,8 +97,14 @@ var Application = React.createClass({
 			? (
 				<LoginWindow
 					onSignupRequest={() => this.setState({isSigningup: true})}
-				/>
-			) : <SignupWindow />;
+					onSigninSuccess={(name) => this.setState({
+						username: name,
+						showLoginWindow: false,
+					})}/>
+			) : <SignupWindow onSignupSuccess={() => this.setState({
+				showLoginWindow: false,
+				isSigningup: false,
+			})}/>;
 
 		return this.state.showLoginWindow
 			? (
