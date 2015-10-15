@@ -2,6 +2,7 @@
 
 'use strict';
 
+var DOMParser = require('xmldom').DOMParser;
 var IVideoPlayback = require('./IVideoPlayback');
 
 class YoutubePlayback extends IVideoPlayback {
@@ -29,6 +30,14 @@ class YoutubePlayback extends IVideoPlayback {
 
   getTotalTime(): number {
     return this.player.getDuration();
+  }
+
+  getWidth(): number {
+    return parseInt(this.player.getIframe().getAttribute('width'), 10);
+  }
+
+  getHeight(): number {
+    return parseInt(this.player.getIframe().getAttribute('height'), 10);
   }
 }
 

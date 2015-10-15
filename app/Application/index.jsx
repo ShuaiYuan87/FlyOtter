@@ -16,6 +16,7 @@ var RouteHandler = require("react-router").RouteHandler;
 var SignupWindow = require('../Accounts/SignupWindow.react');
 var StyleSheet = require('react-style');
 
+require('./style.css');
 require('../bootstrap/css/bootstrap.min.css');
 
 var ButtonToolbar = Bootstrap.ButtonToolbar;
@@ -55,7 +56,7 @@ var Application = React.createClass({
 			Object.assign(style, styles.buttonSpanButtonDown);
 		}
 		return (
-			<div>
+			<div style={{height: '100%'}}>
 				<div style={styles.banner}>
 					<span style={styles.logo}>
 						KeeKwoon
@@ -101,7 +102,7 @@ var Application = React.createClass({
 						}
 					</span>
 				</div>
-				<RouteHandler />
+				<RouteHandler/>
 			</div>
 		);
 	},

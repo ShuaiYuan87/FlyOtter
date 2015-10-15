@@ -1,5 +1,8 @@
-body {
-
+html, body {
+	margin:0;
+	padding:0;
+	height:100%;
+	width:100%;
 }
 
 .local[banner] {
@@ -15,4 +18,12 @@ body {
 .application.loading {
 	opacity: 0.2;
 	transition: opacity 600ms;
+}
+
+div[data-reactid~=".0.1"] {
+	height: 100%;
+}
+
+div#content {
+	height: 100%;
 }
