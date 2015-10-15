@@ -22,7 +22,7 @@ var LoginWindow = React.createClass({
 
   getInitialState(): Object {
     return {
-      email: '',
+      name: '',
       password: '',
     };
   },
@@ -33,9 +33,9 @@ var LoginWindow = React.createClass({
         <h3>Sign in to watch videos with friends.</h3>
         <Input
           style={styles.inputRow}
-          label='Email'
-          placeholder="Email address"
-          valueLink={this.linkState('email')}/>
+          label='Name'
+          placeholder="Account name"
+          valueLink={this.linkState('name')}/>
         <Input
           style={styles.inputRow}
           label='Password'
@@ -59,7 +59,7 @@ var LoginWindow = React.createClass({
 
   _onLogin(): void {
     var Parse = ParseFactory.getParse();
-    Parse.User.logIn(this.state.email, this.state.password, {
+    Parse.User.logIn(this.state.name, this.state.password, {
       success: (user) => {
         var currentUser = Parse.User.current();
         if (currentUser) {

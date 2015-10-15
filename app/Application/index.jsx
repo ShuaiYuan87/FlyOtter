@@ -6,6 +6,7 @@
 'use strict';
 
 var Arbiter = require('arbiter-subpub');
+var Bootstrap = require('react-bootstrap');
 var Button = require('react-button');
 var Icon = require('../Icons/Icon.react');
 var LoginWindow = require('../Accounts/LoginWindow.react');
@@ -15,6 +16,11 @@ var RouteHandler = require("react-router").RouteHandler;
 var SignupWindow = require('../Accounts/SignupWindow.react');
 var StyleSheet = require('react-style');
 
+require('../bootstrap/css/bootstrap.min.css');
+
+var ButtonToolbar = Bootstrap.ButtonToolbar;
+var DropdownButton = Bootstrap.DropdownButton;
+var MenuItem = Bootstrap.MenuItem;
 var {ModalContainer, ModalDialog} = require('react-modal-dialog');
 
 var Application = React.createClass({
@@ -29,12 +35,17 @@ var Application = React.createClass({
 	},
 
 	_getLoginName(): ?string {
-		// var Parse = ParseFactory.getParse();
-		// var currentUser = Parse.User.current();
-		// if (currentUser) {
-		// 	return currentUser.get('username');
-		// }
+		var Parse = ParseFactory.getParse();
+		var currentUser = Parse.User.current();
+		if (currentUser) {
+			return currentUser.get('username');
+		}
 		return null;
+	},
+
+	_signout(): void {
+		ParseFactory.getParse().User.logOut();
+		this.setState({username: ''});
 	},
 
 	render: function(): Object {
@@ -74,22 +85,34 @@ var Application = React.createClass({
 						</span>
 					</span>
 					<span style={styles.loginSection}>
-						<Button
-							style={styles.loginButton}
-							theme={styles.loginButtontheme}
-							onClick={() => this.setState({showLoginWindow: true})}>
-							<Icon icon='account-circle' style={{marginRight: 5}}/>
-							{this.state.username || 'sign in'}
-							{
-								this._getSignupOrLoginWindow()
-							}
-						</Button>
+						{
+							this.state.username
+								? this._getUserDropdown(this.state.username)
+								: <Button
+										style={styles.loginButton}
+										theme={styles.loginButtontheme}
+										onClick={() => this.setState({showLoginWindow: true})}>
+										<Icon icon='account-circle' style={{marginRight: 5}}/>
+										{'sign in'}
+										{
+											this._getSignupOrLoginWindow()
+										}
+									</Button>
+						}
 					</span>
 				</div>
 				<RouteHandler />
-
 			</div>
 		);
+	},
+
+	_getUserDropdown(username: string): any {
+		return (
+			<DropdownButton title={username} id={`dropdown-basic-i`}>
+      	<MenuItem onSelect={() => this._signout()}>Sign out</MenuItem>
+    	</DropdownButton>
+		);
+
 	},
 
 	_getSignupOrLoginWindow(): any {
