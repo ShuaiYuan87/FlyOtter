@@ -5,6 +5,8 @@
 'use strict';
 
 var Parse = require('parse').Parse;
+var localStorage = require('localStorage');
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 var appID = "a1SGzTZWPn1t9lwXnDG4FTUcpoTUDyyp7ZInhtxZ";
 var javascriptKey = "uV0nfzaCO18SwcHPct0kOqBeNxAqADInGW0VfS93";
