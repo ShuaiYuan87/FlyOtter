@@ -12,9 +12,6 @@ var ParseFactory = require('../ParseFactory');
 var React = require('react');
 var StyleSheet = require('react-style');
 
-var localStorage = require('localStorage');
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-
 var LoginWindow = React.createClass({
   mixins: [LinkedStateMixin],
 
