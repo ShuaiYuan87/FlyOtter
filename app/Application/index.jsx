@@ -6,26 +6,47 @@
 'use strict';
 
 var Arbiter = require('arbiter-subpub');
+var Bootstrap = require('react-bootstrap');
 var Button = require('react-button');
 var Icon = require('../Icons/Icon.react');
 var LoginWindow = require('../Accounts/LoginWindow.react');
+var ParseFactory = require('../ParseFactory');
 var React = require("react");
 var RouteHandler = require("react-router").RouteHandler;
 var SignupWindow = require('../Accounts/SignupWindow.react');
 var StyleSheet = require('react-style');
 
+require('./style.css');
+require('../bootstrap/css/bootstrap.min.css');
+
+var ButtonToolbar = Bootstrap.ButtonToolbar;
+var DropdownButton = Bootstrap.DropdownButton;
+var MenuItem = Bootstrap.MenuItem;
 var {ModalContainer, ModalDialog} = require('react-modal-dialog');
 
 var Application = React.createClass({
-
-
 	getInitialState(): Object {
 		return {
 			isButtonDown: false,
 			videoURL: 'https://www.youtube.com/watch?v=yASopBwB_t4',
 			showLoginWindow: false,
 			isSigningup: false,
+			username: this._getLoginName(),
 		};
+	},
+
+	_getLoginName(): ?string {
+		var Parse = ParseFactory.getParse();
+		var currentUser = Parse.User.current();
+		if (currentUser) {
+			return currentUser.get('username');
+		}
+		return null;
+	},
+
+	_signout(): void {
+		ParseFactory.getParse().User.logOut();
+		this.setState({username: ''});
 	},
 
 	render: function(): Object {
@@ -36,7 +57,7 @@ var Application = React.createClass({
 		}
 
 		return (
-			<div>
+			<div style={{height: '100%'}}>
 				<div style={styles.banner}>
 					<span style={styles.logo}>
 						KeeKwoon
@@ -66,22 +87,34 @@ var Application = React.createClass({
 						</span>
 					</span>
 					<span style={styles.loginSection}>
-						<Button
-							style={styles.loginButton}
-							theme={styles.loginButtontheme}
-							onClick={() => this.setState({showLoginWindow: true})}>
-							<Icon icon='account-circle' style={{marginRight: 5}}/>
-							sign in
-							{
-								this._getSignupOrLoginWindow()
-							}
-						</Button>
+						{
+							this.state.username
+								? this._getUserDropdown(this.state.username)
+								: <Button
+										style={styles.loginButton}
+										theme={styles.loginButtontheme}
+										onClick={() => this.setState({showLoginWindow: true})}>
+										<Icon icon='account-circle' style={{marginRight: 5}}/>
+										{'sign in'}
+										{
+											this._getSignupOrLoginWindow()
+										}
+									</Button>
+						}
 					</span>
 				</div>
-				<RouteHandler />
-
+				<RouteHandler/>
 			</div>
 		);
+	},
+
+	_getUserDropdown(username: string): any {
+		return (
+			<DropdownButton title={username} id={`dropdown-basic-i`}>
+      	<MenuItem onSelect={() => this._signout()}>Sign out</MenuItem>
+    	</DropdownButton>
+		);
+
 	},
 
 	_getSignupOrLoginWindow(): any {
@@ -89,8 +122,14 @@ var Application = React.createClass({
 			? (
 				<LoginWindow
 					onSignupRequest={() => this.setState({isSigningup: true})}
-				/>
-			) : <SignupWindow />;
+					onSigninSuccess={(name) => this.setState({
+						username: name,
+						showLoginWindow: false,
+					})}/>
+			) : <SignupWindow onSignupSuccess={() => this.setState({
+				showLoginWindow: false,
+				isSigningup: false,
+			})}/>;
 
 		return this.state.showLoginWindow
 			? (

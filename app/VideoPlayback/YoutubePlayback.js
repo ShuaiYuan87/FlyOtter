@@ -2,6 +2,7 @@
 
 'use strict';
 
+var DOMParser = require('xmldom').DOMParser;
 var IVideoPlayback = require('./IVideoPlayback');
 var PlayerState = require('../PlayerState');
 
@@ -38,6 +39,14 @@ class YoutubePlayback extends IVideoPlayback {
     {
       return PlayerState.UNSTARTED;
     }
+  }
+
+  getWidth(): number {
+    return parseInt(this.player.getIframe().getAttribute('width'), 10);
+  }
+
+  getHeight(): number {
+    return parseInt(this.player.getIframe().getAttribute('height'), 10);
   }
 }
 

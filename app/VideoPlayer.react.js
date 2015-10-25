@@ -16,6 +16,8 @@ var RemotePlaybackControl = require('./RemotePlaybackControl');
 var StyleSheet = require('react-style');
 var PlayerState = require('./PlayerState.js')
 
+var merge = require('merge');
+
 var VIDEO_PLAYER_ID = 'keekwoon-player';
 //var serverIP = '73.231.32.235';
 var HOST = 'localhost';
@@ -90,12 +92,9 @@ var VideoPlayer = React.createClass({
     return (
       <div style={styles.screen}>
         <div style={styles.videoContainer}>
-          <div style={styles.overlay} id={VIDEO_PLAYER_ID}/>
+          <div style={merge({}, styles.overlay, {margin: 'auto'})} id={VIDEO_PLAYER_ID}/>
           <div
-            styles={[
-              styles.overlay,
-              styles.canvas,
-            ]}
+            style={merge({}, styles.overlay, styles.canvas)}
             onClick={this._togglePlayerState}
           >
             <ChatPane>
@@ -195,11 +194,10 @@ var styles = StyleSheet.create({
   },
   videoContainer: {
     width: '100%',
-    height: '700',
+    height: '100%',
     position: 'relative',
   },
   screen: {
-    padding: '20px 20px',
     background: 'black',
     height: '100%',
   }

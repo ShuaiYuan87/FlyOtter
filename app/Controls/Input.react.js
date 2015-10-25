@@ -8,10 +8,13 @@
 var React = require('react');
 var StyleSheet = require('react-style');
 
+var merge = require('merge');
+
 var Input = React.createClass({
   propTypes: {
     label: React.PropTypes.node.isRequired,
     placeholder: React.PropTypes.string.isRequired,
+    valueLink: React.PropTypes.object.isRequired,
   },
 
   getInitialState(): Object {
@@ -22,12 +25,20 @@ var Input = React.createClass({
 
   render(): ?Object {
     var {style} = this.props;
+    var inputStyle = merge(
+      {},
+      styles.input,
+      this.state.focus ? styles.inputFocus : {}
+    );
     return (
-      <div styles={[styles.container, style]}>
+      <div style={merge({}, styles.container, style)}>
         <label style={styles.label}> {this.props.label} </label>
         <input
-          styles={[styles.input, this.state.focus ? styles.inputFocus : null]}
+          style={inputStyle}
           placeholder={this.props.placeholder}
+          onChange={
+            (evt) => this.props.valueLink.requestChange(evt.target.value)
+          }
           onFocus={() => this.setState({focus: true})}
           onBlur={() => this.setState({focus: false})}
         />

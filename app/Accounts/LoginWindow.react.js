@@ -7,12 +7,24 @@
 
 var Button = require('react-button');
 var Input = require('../Controls/Input.react');
+var LinkedStateMixin = require('react-addons-linked-state-mixin');
+var ParseFactory = require('../ParseFactory');
 var React = require('react');
 var StyleSheet = require('react-style');
 
 var LoginWindow = React.createClass({
+  mixins: [LinkedStateMixin],
+
   propTypes: {
     onSignupRequest: React.PropTypes.func.isRequired,
+    onSigninSuccess: React.PropTypes.func.isRequired,
+  },
+
+  getInitialState(): Object {
+    return {
+      name: '',
+      password: '',
+    };
   },
 
   render(): ?Object {
@@ -21,22 +33,48 @@ var LoginWindow = React.createClass({
         <h3>Sign in to watch videos with friends.</h3>
         <Input
           style={styles.inputRow}
-          label='Email'
-          placeholder="Email address"/>
+          label='Name'
+          placeholder="Account name"
+          valueLink={this.linkState('name')}/>
         <Input
           style={styles.inputRow}
           label='Password'
-          placeholder="Password" />
+          placeholder="Password"
+          valueLink={this.linkState('password')} />
         <div>
           <Button
-            style={styles.signupButton} 
+            style={styles.loginButton}
+            onClick={this._onLogin}>
+            Log in
+          </Button>
+          <Button
+            style={styles.signupButton}
             onClick={() => this.props.onSignupRequest()}>
             I don't have an account yet
           </Button>
         </div>
       </div>
     )
-  }
+  },
+
+  _onLogin(): void {
+    var Parse = ParseFactory.getParse();
+    Parse.User.logIn(this.state.name, this.state.password, {
+      success: (user) => {
+        var currentUser = Parse.User.current();
+        if (currentUser) {
+          this.props.onSigninSuccess(currentUser.get('username'));
+        } else {
+            // show the signup or login page
+        }
+        console.log('login successful');
+      },
+      error: (user, error) => {
+          // TODO display error
+        debugger;
+      }
+    });
+  },
 });
 
 var styles = StyleSheet.create({
@@ -52,6 +90,10 @@ var styles = StyleSheet.create({
   inputRow: {
     width: 350,
     marginBottom: 15,
+  },
+  loginButton: {
+    display: 'inline-block',
+    padding: '5px 15px',
   },
   signupButton: {
     display: 'inline-block',
