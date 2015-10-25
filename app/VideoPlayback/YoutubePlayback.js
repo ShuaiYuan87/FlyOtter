@@ -2,7 +2,6 @@
 
 'use strict';
 
-var DOMParser = require('xmldom').DOMParser;
 var IVideoPlayback = require('./IVideoPlayback');
 
 class YoutubePlayback extends IVideoPlayback {
