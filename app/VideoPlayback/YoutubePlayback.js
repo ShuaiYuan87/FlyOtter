@@ -3,6 +3,7 @@
 'use strict';
 
 var IVideoPlayback = require('./IVideoPlayback');
+var PlayerState = require('../PlayerState');
 
 class YoutubePlayback extends IVideoPlayback {
   player: Object;
@@ -12,6 +13,7 @@ class YoutubePlayback extends IVideoPlayback {
   }
 
   play(): void {
+    console.log(this.player);
     this.player.playVideo();
   }
 
@@ -29,6 +31,13 @@ class YoutubePlayback extends IVideoPlayback {
 
   getTotalTime(): number {
     return this.player.getDuration();
+  }
+
+  getState() : number {
+    swtich (this.player.getPlayerState())
+    {
+      return PlayerState.UNSTARTED;
+    }
   }
 
   getWidth(): number {

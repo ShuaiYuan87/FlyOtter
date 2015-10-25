@@ -3,14 +3,14 @@
 'use strict';
 
 var IVideoPlayback = require('../VideoPlayback/IVideoPlayback');
-
+var PlayerState = require('../PlayerState.js')
 /**
  * An interface for all different types of video loaders
  */
 class IVideoLoader {
   // event that's fired when the video loader has all scripts initialized
   videoScriptReady: () => void;
-  videoPlayerReady: () => void;
+  videoPlayerReady: (time: number, state: string) => void;
 
   // Event handlers for script loader
   onScriptLoaded(): void {}
@@ -28,12 +28,12 @@ class IVideoLoader {
     return '';
   }
 
-  loadVideo: (htmlElementID: string, videoID: string) => IVideoPlayback;
+  loadVideo: (htmlElementID: string, videoID: string, time: number, state: string) => IVideoPlayback;
 
   clearVideo(htmlElementID: string): void {}
 
-  onVideoPlayerReady(): void {
-    this.videoPlayerReady && this.videoPlayerReady();
+  onVideoPlayerReady(time: number, state: string): void {
+    this.videoPlayerReady && this.videoPlayerReady(time, state);
   }
 }
 

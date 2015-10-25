@@ -14,8 +14,12 @@ class IVideoPlayback {
   // info
   getCurrentTime: () => number;
   getTotalTime:() => number;
+
+  getState:() => number;
+
   getWidth:() => number;
   getHeight:() => number;
+
 }
 
 module.exports = IVideoPlayback;

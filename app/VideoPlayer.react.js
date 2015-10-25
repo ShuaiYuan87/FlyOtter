@@ -14,6 +14,7 @@ var PlaybackControl = require('./PlaybackControl');
 var React = require('react');
 var RemotePlaybackControl = require('./RemotePlaybackControl');
 var StyleSheet = require('react-style');
+var PlayerState = require('./PlayerState.js')
 
 var merge = require('merge');
 
@@ -37,11 +38,11 @@ var VideoPlayer = React.createClass({
       ROOM_ID
     );
 
-    remote.onLoadVideo = (videoURL) => {
+    remote.onLoadVideo = (videoURL, time, state) => {
       this.setState({
         videoURL: videoURL,
       });
-      PlaybackControl.getControl().loadVideo(VIDEO_PLAYER_ID, videoURL);
+      PlaybackControl.getControl().loadVideo(VIDEO_PLAYER_ID, videoURL, time, state);
       PlaybackControl.getControl().playerTick =
         (time) => this.setState({currentTime: time});
     };
@@ -54,6 +55,12 @@ var VideoPlayer = React.createClass({
     remote.onReceiveMessage = (text) => {
       this._addMessage(text);
     };
+    remote.getState = () => {
+      return PlaybackControl.getControl().playerState;
+    };
+    remote.getCurrentTime = () => {
+      return PlaybackControl.getControl().getCurrentTime();
+    }
 
     return {
       videoURL: '',
@@ -149,7 +156,7 @@ var VideoPlayer = React.createClass({
   _loadVideo: function(url: string): void {
     var playbackControl = PlaybackControl.getControl();
     this.state.remotePlaybackControl.loadVideo(url);
-    playbackControl.loadVideo(VIDEO_PLAYER_ID, url);
+    playbackControl.loadVideo(VIDEO_PLAYER_ID, url, 0, PlayerState.UNSTARTED);
     playbackControl.playerTick = (time) => this.setState({currentTime: time});
   },
 

@@ -28,7 +28,7 @@ var Application = React.createClass({
 	getInitialState(): Object {
 		return {
 			isButtonDown: false,
-			videoURL: 'https://www.youtube.com/watch?v=bdcnB3A9r7I',
+			videoURL: 'https://www.youtube.com/watch?v=yASopBwB_t4',
 			showLoginWindow: false,
 			isSigningup: false,
 			username: this._getLoginName(),
@@ -55,6 +55,7 @@ var Application = React.createClass({
 		if (this.state.isButtonDown) {
 			Object.assign(style, styles.buttonSpanButtonDown);
 		}
+
 		return (
 			<div style={{height: '100%'}}>
 				<div style={styles.banner}>
