@@ -59,18 +59,22 @@ io.on('connection', function(socket){
     console.log('a user connected');
     socket.on('create', function (room) {
         if (!(room in owner_map)) {
+            console.error('new room' + room);
             owner_map[room] = socket;
         }
+        else {
+            console.error('join room' + room);
+            var message = {
+                videoId : videoUrlByRoomID[room],
+            };
+            sendMessage(message, room, 'check_state', true);
+        }
+
         socket.join(room);
         socket.room = room;
         console.log('socket joining ' + room);
     });
-    socket.on('check_state', function (room) {
-        var message = {
-                //reply_socket: socket,
-        };
-        sendMessage(message, room, 'check_state', true);
-    });
+    
     socket.on('postData', function (data) {
         console.error('received message ' + data);
         var data = JSON.parse(data);
@@ -94,6 +98,8 @@ io.on('connection', function(socket){
         // Too much POST data, kill the connection!
         if (data.length > 1e6)
             request.connection.destroy();
+        videoUrlByRoomID[socket.room] = data.videoId;
+        console.log('reload' + data.videoId);
         sendMessage(data, socket.room, 'reload');
     });
     socket.on('init', function (data) {

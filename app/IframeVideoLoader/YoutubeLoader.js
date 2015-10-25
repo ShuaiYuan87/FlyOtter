@@ -35,7 +35,7 @@ class YoutubeLoader extends IVideoLoader {
     return id;
   }
 
-  loadVideo(htmlElementID: string, videoID: string): IVideoPlayback {
+  loadVideo(htmlElementID: string, videoID: string, time: number, state: string): IVideoPlayback {
     if (this.player) {
       this.clearVideo(htmlElementID);
     }
@@ -47,8 +47,11 @@ class YoutubeLoader extends IVideoLoader {
         showinfo: 0,
         rel: 0,
       },
+      events: {
+        'onReady': () => super.onVideoPlayerReady(time, state),
+      },
     });
-    super.onVideoPlayerReady();
+    //super.onVideoPlayerReady();
     return new YoutubePlayback(this.player);
   }
 

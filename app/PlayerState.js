@@ -11,6 +11,7 @@ Object.assign(
   PlayerState, {
     PLAYING: 'PLAYING',
     PAUSED: 'PAUSED',
+    UNSTARTED: 'UNSTARTED'
   }
 );
 
