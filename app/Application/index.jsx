@@ -102,7 +102,9 @@ var Application = React.createClass({
 									</Button>
 						}
 					</span>
+					<span className="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="false"></span>
 				</div>
+
 				<RouteHandler/>
 			</div>
 		);

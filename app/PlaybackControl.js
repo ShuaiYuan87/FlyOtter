@@ -173,11 +173,13 @@ class PlaybackControl {
       }.bind(this),
       500
     );
+    
+    if (state == PlayerState.PAUSED){
+      this.play();
+      this.pause();
+    }
     if (time != 0) {
       this.seekTo(time);
-    }
-    if (state == PlayerState.PLAYING){
-      this.play();
     }
   }
 }

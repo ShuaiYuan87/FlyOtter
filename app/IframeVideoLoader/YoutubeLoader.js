@@ -46,6 +46,8 @@ class YoutubeLoader extends IVideoLoader {
         controls: 0,
         showinfo: 0,
         rel: 0,
+        autoplay: 0,
+        start: time,
       },
       events: {
         'onReady': () => super.onVideoPlayerReady(time, state),
