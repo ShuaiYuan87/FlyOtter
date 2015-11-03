@@ -20,8 +20,8 @@ var merge = require('merge');
 
 var VIDEO_PLAYER_ID = 'keekwoon-player';
 //var serverIP = '73.231.32.235';
-var HOST = 'localhost';
-var PORT = 8989;
+var HOST = process.env.SYNC_HOST || 'localhost';
+var PORT = process.env.SYNC_PORT || 8989;
 var ROOM_ID = 1234;
 
 var VideoPlayer = React.createClass({
