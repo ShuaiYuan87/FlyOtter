@@ -55,6 +55,7 @@
     "react-hot-loader": "^1.0.0",
     "react-input": "^2.0.2",
     "react-addons-linked-state-mixin": "^0.14.0",
+    "react-fullscreen": "^0.1.0",
     "react-modal-dialog": "^0.1.4",
     "react-motion": "^0.3.0",
     "react-proxy-loader": "^0.3.1",

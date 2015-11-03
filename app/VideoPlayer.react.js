@@ -25,6 +25,11 @@ var PORT = 8989;
 var ROOM_ID = 1234;
 
 var VideoPlayer = React.createClass({
+  propTypes: {
+//    width: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number.isRequired,
+  },
+
   componentDidMount: function(): void {
     Arbiter.subscribe('video/load', (data) => {
       this._loadVideo(data.url);
@@ -105,7 +110,7 @@ var VideoPlayer = React.createClass({
 
     return (
       <div style={styles.screen}>
-        <div style={styles.videoContainer}>
+        <div style={merge(styles.videoContainer, {height: this.props.height})}>
           <div style={merge({}, styles.overlay, {margin: 'auto'})} id={VIDEO_PLAYER_ID}/>
           <div
             style={merge({}, styles.overlay, styles.canvas)}
@@ -208,7 +213,6 @@ var styles = StyleSheet.create({
   },
   videoContainer: {
     width: '100%',
-    height: '100%',
     position: 'relative',
   },
   screen: {
