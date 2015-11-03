@@ -31,6 +31,8 @@ var VideoPlayer = React.createClass({
   },
 
   componentDidMount: function(): void {
+    console.log(HOST);
+    console.log(PORT);
     Arbiter.subscribe('video/load', (data) => {
       this._loadVideo(data.url);
     });
