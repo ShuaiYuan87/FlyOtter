@@ -121,7 +121,7 @@ module.exports = function(options) {
 				"process.env": {
 					NODE_ENV: JSON.stringify("production"),
 					SYNC_HOST: JSON.stringify(process.env.SYNC_HOST),
-					SYNC_PORT: JSON.stringify(process.env.SYNC_PORT)
+					SYNC_PORT: JSON.stringify(parseInt(process.env.SYNC_PORT))
 				}
 			}),
 			new webpack.NoErrorsPlugin()
