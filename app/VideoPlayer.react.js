@@ -14,7 +14,7 @@ var PlaybackControl = require('./PlaybackControl');
 var React = require('react');
 var RemotePlaybackControl = require('./RemotePlaybackControl');
 var StyleSheet = require('react-style');
-var PlayerState = require('./PlayerState.js')
+var PlayerState = require('./PlayerState.js');
 
 var merge = require('merge');
 
