@@ -23,17 +23,29 @@ var VIDEO_PLAYER_ID = 'keekwoon-player';
 var HOST = 'localhost';
 var PORT = 8989;
 var ROOM_ID = 1234;
+var fb_id;
 
 var VideoPlayer = React.createClass({
   componentDidMount: function(): void {
     Arbiter.subscribe('video/load', (data) => {
       this._loadVideo(data.url);
     });
+
+    Arbiter.subscribe('fb/logout', () => {
+      FB.logout(function(response) {
+        // Person is now logged out
+      });
+    });
+
     window.fbAsyncInit = function() {
       FB.init({
-        appId      : '106676343020606',
+        appId      : '1204292072921486',
         xfbml      : true,
         version    : 'v2.4'
+      });
+
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
       });
     };
     (function(d, s, id){
@@ -43,6 +55,44 @@ var VideoPlayer = React.createClass({
        js.src = "//connect.facebook.net/en_US/sdk.js";
        fjs.parentNode.insertBefore(js, fjs);
      }(document, 'script', 'facebook-jssdk'));
+
+    function statusChangeCallback(response) {
+      console.log('statusChangeCallback');
+      console.log(response);
+      // The response object is returned with a status field that lets the
+      // app know the current login status of the person.
+      // Full docs on the response object can be found in the documentation
+      // for FB.getLoginStatus().
+      if (response.status === 'connected') {
+        // Logged into your app and Facebook.
+        testAPI();
+      } else if (response.status === 'not_authorized') {
+        // The person is logged into Facebook, but not your app.
+        document.getElementById('status').innerHTML = 'Please log ' +
+          'into this app.';
+      } else {
+        // The person is not logged into Facebook, so we're not sure if
+        // they are logged into this app or not.
+        document.getElementById('status').innerHTML = 'Please log ' +
+          'into Facebook.';
+      }
+    }
+
+    function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    }
+
+    function testAPI() {
+      console.log('Welcome!  Fetching your information.... ');
+      FB.api('/me', function(response) {
+        console.log('Successful login for: ' + response.name);
+        
+        fb_id = response.id;
+        console.log('Successful login for: ' + fb_id);
+      });
+    }
   },
 
   getInitialState: function(): Object {
@@ -90,7 +140,7 @@ var VideoPlayer = React.createClass({
   _addMessage(message: string): void {
     var chatheads = this.state.chatheads;
     chatheads.push(
-      <Chathead text={message} />
+      <Chathead text={message} fb_id={fb_id} />
     );
     this.setState({
       chatheads: chatheads,

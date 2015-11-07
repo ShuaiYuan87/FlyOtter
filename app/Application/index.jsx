@@ -102,7 +102,15 @@ var Application = React.createClass({
 									</Button>
 						}
 					</span>
-					<span className="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="false"></span>
+					<span className="fb-login-button" onlogin="checkLoginState();" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="false"></span>
+					<span style={styles.logoutButton}>
+					<Button 
+						onClick={() => {
+							  Arbiter.publish("fb/logout", {});
+							}}>
+						{'logout'}
+					</Button>
+					</span>
 				</div>
 
 				<RouteHandler/>
@@ -189,6 +197,9 @@ var styles = StyleSheet.create({
 		display: 'inline-block',
 	},
 	loginButton: {
+		padding: '5px 15px',
+	},
+	logoutButton: {
 		padding: '5px 15px',
 	},
 	loginButtontheme: {

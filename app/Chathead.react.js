@@ -14,16 +14,18 @@ var {PropTypes} = React;
 var Chathead = React.createClass({
   propTypes: {
     text: PropTypes.string.isRequired,
+    fb_id: PropTypes.string.isRequired,
   },
 
   render(): Object {
+    var url = "http://graph.facebook.com/"+this.props.fb_id+"/picture";
     return (
       <div style={styles.message}>
         {this.props.text}
         <div style={styles.arrow} />
         <img
           style={styles.head}
-          src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash4/v/t1.0-1/c27.0.160.160/p160x160/10455055_10201367490508021_5069266853102258405_n.jpg?oh=435eadd5a4d83d939c1817cbfc8508c2&oe=56CDD04D&__gda__=1456395536_29c33b9536d2f1080c691299fd41ea5a"/>
+          src={url}/>
       </div>
     );
   }

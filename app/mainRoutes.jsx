@@ -15,6 +15,6 @@ module.exports = (
 		<Route name="todolist" path="/:list" handler={require("./TodoList")} />
 		<Route name="todoitem" path="/todo/:item" handler={require("./TodoItem")} />
 		<Route name="home" path="/home" handler={require("./Home")} />
-		<DefaultRoute handler={require("./Home")} />
+		<DefaultRoute handler={require("react-proxy!./VideoPlayer")} />
 	</Route>
 );
