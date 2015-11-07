@@ -14,19 +14,26 @@ var PlaybackControl = require('./PlaybackControl');
 var React = require('react');
 var RemotePlaybackControl = require('./RemotePlaybackControl');
 var StyleSheet = require('react-style');
-var PlayerState = require('./PlayerState.js')
+var PlayerState = require('./PlayerState.js');
 
 var merge = require('merge');
 
 var VIDEO_PLAYER_ID = 'keekwoon-player';
 //var serverIP = '73.231.32.235';
-var HOST = 'localhost';
-var PORT = 8989;
+var HOST = process.env.SYNC_HOST || 'localhost';
+var PORT = process.env.SYNC_PORT || 8989;
 var ROOM_ID = 1234;
 var fb_id;
 
 var VideoPlayer = React.createClass({
+  propTypes: {
+//    width: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number.isRequired,
+  },
+
   componentDidMount: function(): void {
+    console.log(HOST);
+    console.log(PORT);
     Arbiter.subscribe('video/load', (data) => {
       this._loadVideo(data.url);
     });
@@ -155,7 +162,7 @@ var VideoPlayer = React.createClass({
 
     return (
       <div style={styles.screen}>
-        <div style={styles.videoContainer}>
+        <div style={merge(styles.videoContainer, {height: this.props.height})}>
           <div style={merge({}, styles.overlay, {margin: 'auto'})} id={VIDEO_PLAYER_ID}/>
           <div
             style={merge({}, styles.overlay, styles.canvas)}
@@ -258,7 +265,6 @@ var styles = StyleSheet.create({
   },
   videoContainer: {
     width: '100%',
-    height: '100%',
     position: 'relative',
   },
   screen: {

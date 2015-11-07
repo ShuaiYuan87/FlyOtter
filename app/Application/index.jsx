@@ -57,7 +57,7 @@ var Application = React.createClass({
 		}
 
 		return (
-			<div style={{height: '100%'}}>
+			<div>
 				<div style={styles.banner}>
 					<span style={styles.logo}>
 						KeeKwoon

@@ -119,7 +119,9 @@ module.exports = function(options) {
 			new webpack.optimize.DedupePlugin(),
 			new webpack.DefinePlugin({
 				"process.env": {
-					NODE_ENV: JSON.stringify("production")
+					NODE_ENV: JSON.stringify("production"),
+					SYNC_HOST: JSON.stringify(process.env.SYNC_HOST),
+					SYNC_PORT: JSON.stringify(parseInt(process.env.SYNC_PORT))
 				}
 			}),
 			new webpack.NoErrorsPlugin()
