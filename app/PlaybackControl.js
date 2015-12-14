@@ -178,6 +178,9 @@ class PlaybackControl {
       this.play();
       this.pause();
     }
+    else if (state == PlayerState.PLAYING){
+      this.play();
+    }
     if (time != 0) {
       this.seekTo(time);
     }

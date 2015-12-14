@@ -183,12 +183,15 @@ var VideoPlayer = React.createClass({
           value={this.state.text}
           onChange={evt => this.setState({
             text: evt.target.value
-        })}/>
+          })}
+          onKeyDown={evt => this._add(evt)}
+        />
 
         <Icon icon="my-icon"/>
         <button onClick={() => {
           this.state.remotePlaybackControl.sendChat(this.state.text, -356);
           this._addMessage(this.state.text);
+          this.setState({text: ''});
         }}>
           add chat
         </button>
@@ -206,6 +209,14 @@ var VideoPlayer = React.createClass({
       </div>
     );
   },
+
+  _add: function(event){
+       if(event.keyCode == 13){
+          this.state.remotePlaybackControl.sendChat(this.state.text, -356);
+          this._addMessage(this.state.text);
+          this.setState({text: ''});
+       }
+   },
 
   _handleProgressChange: function (percent: number): void {
     var playbackControl = PlaybackControl.getControl();
