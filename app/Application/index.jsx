@@ -24,14 +24,18 @@ var DropdownButton = Bootstrap.DropdownButton;
 var MenuItem = Bootstrap.MenuItem;
 var {ModalContainer, ModalDialog} = require('react-modal-dialog');
 
+var ROOM_ID = 1234;
+var UNIVERSE = 100000;
+
 var Application = React.createClass({
 	getInitialState(): Object {
 		return {
 			isButtonDown: false,
-			videoURL: 'https://www.youtube.com/watch?v=yASopBwB_t4',
+			videoURL: 'Please enter your video url here.',
 			showLoginWindow: false,
 			isSigningup: false,
 			username: this._getLoginName(),
+			showCopyURLWindow: false,
 		};
 	},
 
@@ -69,12 +73,16 @@ var Application = React.createClass({
 							onChange={evt => this.setState({
 		            videoURL: evt.target.value
 							})}
+							onKeyDown={evt => this._add(evt)}
 							value={this.state.videoURL}
 						>  </input>
 						<span
 							style={style}
 							onClick={() => {
-							  Arbiter.publish("video/load", {url: this.state.videoURL});
+							  ROOM_ID = Math.floor(Math.random() * UNIVERSE);;
+							  Arbiter.publish("video/load", {url: this.state.videoURL, roomID: ROOM_ID});
+							  //this.state.showCopyURLWindow = true;
+							  this.setState({showCopyURLWindow: true});
 							}}
 							onMouseDown={() => {
 								this.setState({isButtonDown: true});
@@ -84,6 +92,10 @@ var Application = React.createClass({
 								style={styles.icon}
 								icon='add-circle'
 							/>
+							{
+								this._copyURLWindow()
+							}
+							
 						</span>
 					</span>
 					<span style={styles.loginSection}>
@@ -117,6 +129,12 @@ var Application = React.createClass({
 			</div>
 		);
 	},
+
+	_add(e: event): void{
+       if(e.keyCode == 13){
+          Arbiter.publish("video/load", {url: this.state.videoURL});
+       }
+    },
 
 	_getUserDropdown(username: string): any {
 		return (
@@ -152,9 +170,34 @@ var Application = React.createClass({
 				</ModalContainer>
 			) : null;
 	},
+
+	_copyURLWindow(): any {
+		
+		return this.state.showCopyURLWindow
+			? (
+				<ModalContainer
+					onClose={() => this.setState({showCopyURLWindow: false})}>
+					<ModalDialog
+						onClose={() => {}}>
+						{<div style={styles.dialogContainer}> 
+							<h3>Please share the URL http://da165706.ngrok.io/{ROOM_ID}	to watch together with friends.</h3>
+						</div>}
+					</ModalDialog>
+				</ModalContainer>
+			) : null;
+	},
 });
 
 var styles = StyleSheet.create({
+	dialogContainer: {
+	    borderRadius: 20,
+	    background: '#fafdff',
+	    color: '#5a6b77',
+	    display: 'flex',
+	    flex: 1,
+	    flexDirection: 'column',
+	    alignItems: 'center',
+	  },
 	banner: {
 		height: '44px',
 		backgroundColor: 'rgb(38, 38, 38)',
@@ -190,6 +233,7 @@ var styles = StyleSheet.create({
 		width: '500px',
 		height: '28px',
 		fontSize: '16px',
+		opacity: 0.5,
 	},
 	loginSection: {
 		marginLeft: 20,

@@ -20,10 +20,11 @@ var merge = require('merge');
 
 var VIDEO_PLAYER_ID = 'keekwoon-player';
 //var serverIP = '73.231.32.235';
-var HOST = process.env.SYNC_HOST || 'localhost';
+var HOST = '73.231.32.235';//process.env.SYNC_HOST || 'localhost';
 var PORT = process.env.SYNC_PORT || 8989;
 var ROOM_ID = 1234;
 var fb_id;
+var UNIVERSE = 100000;
 
 var VideoPlayer = React.createClass({
   propTypes: {
@@ -34,9 +35,15 @@ var VideoPlayer = React.createClass({
   componentDidMount: function(): void {
     console.log(HOST);
     console.log(PORT);
+    var that = this;
+    var { router } = this.context;
+    ROOM_ID = router.getCurrentQuery().roomID;
     Arbiter.subscribe('video/load', (data) => {
       this._loadVideo(data.url);
+      ROOM_ID = data.roomID;
     });
+
+    
 
     Arbiter.subscribe('fb/logout', () => {
       FB.logout(function(response) {
