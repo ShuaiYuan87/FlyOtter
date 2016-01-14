@@ -15,7 +15,7 @@ var React = require('react');
 var RemotePlaybackControl = require('./RemotePlaybackControl');
 var StyleSheet = require('react-style');
 var PlayerState = require('./PlayerState.js');
-
+var Router = require("react-router");
 var merge = require('merge');
 
 var VIDEO_PLAYER_ID = 'keekwoon-player';
@@ -25,8 +25,11 @@ var PORT = process.env.SYNC_PORT || 8989;
 var ROOM_ID = 1234;
 var fb_id;
 var UNIVERSE = 100000;
-
+var {ModalContainer, ModalDialog} = require('react-modal-dialog');
 var VideoPlayer = React.createClass({
+  contextTypes: {
+    router: React.PropTypes.func
+  },
   propTypes: {
 //    width: React.PropTypes.number.isRequired,
     height: React.PropTypes.number.isRequired,
@@ -35,12 +38,9 @@ var VideoPlayer = React.createClass({
   componentDidMount: function(): void {
     console.log(HOST);
     console.log(PORT);
-    var that = this;
-    var { router } = this.context;
-    ROOM_ID = router.getCurrentQuery().roomID;
+
     Arbiter.subscribe('video/load', (data) => {
       this._loadVideo(data.url);
-      ROOM_ID = data.roomID;
     });
 
     
@@ -110,6 +110,17 @@ var VideoPlayer = React.createClass({
   },
 
   getInitialState: function(): Object {
+    var that = this;
+    var { router } = this.context;
+    ROOM_ID = router.getCurrentQuery().roomID;
+    var should_show_url = false;
+    if (ROOM_ID == undefined) {
+      ROOM_ID = Math.floor(Math.random() * UNIVERSE);
+      should_show_url = true;
+    }
+    else {
+      ROOM_ID = Number(ROOM_ID);
+    }
     var remote = new RemotePlaybackControl(
       HOST,
       PORT,
@@ -148,6 +159,7 @@ var VideoPlayer = React.createClass({
       remotePlaybackControl: remote,
       text: '',
       chatheads: [],
+      showCopyURLWindow: should_show_url,
     };
   },
 
@@ -168,7 +180,13 @@ var VideoPlayer = React.createClass({
       : 0;
 
     return (
+     
       <div style={styles.screen}>
+         <span>
+          {
+            this._copyURLWindow()
+          }
+          </span>
         <div style={merge(styles.videoContainer, {height: this.props.height})}>
           <div style={merge({}, styles.overlay, {margin: 'auto'})} id={VIDEO_PLAYER_ID}/>
           <div
@@ -215,6 +233,22 @@ var VideoPlayer = React.createClass({
         <div> {this.state.currentTime} </div>
       </div>
     );
+  },
+
+  _copyURLWindow: function() {
+    
+    return this.state.showCopyURLWindow
+      ? (
+        <ModalContainer
+          onClose={() => this.setState({showCopyURLWindow: false})}>
+          <ModalDialog
+            onClose={() => {}}>
+            {<div style={styles.dialogContainer}> 
+              <h3>Please share the URL http://da165706.ngrok.io/?roomID={ROOM_ID} to watch together with friends.</h3>
+            </div>}
+          </ModalDialog>
+        </ModalContainer>
+      ) : null;
   },
 
   _add: function(event){
@@ -265,6 +299,15 @@ var VideoPlayer = React.createClass({
 });
 
 var styles = StyleSheet.create({
+  dialogContainer: {
+      borderRadius: 20,
+      background: '#fafdff',
+      color: '#5a6b77',
+      display: 'flex',
+      flex: 1,
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
   overlay: {
     width: '100%',
     height: '100%',

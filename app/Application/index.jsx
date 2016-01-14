@@ -24,9 +24,6 @@ var DropdownButton = Bootstrap.DropdownButton;
 var MenuItem = Bootstrap.MenuItem;
 var {ModalContainer, ModalDialog} = require('react-modal-dialog');
 
-var ROOM_ID = 1234;
-var UNIVERSE = 100000;
-
 var Application = React.createClass({
 	getInitialState(): Object {
 		return {
@@ -35,7 +32,6 @@ var Application = React.createClass({
 			showLoginWindow: false,
 			isSigningup: false,
 			username: this._getLoginName(),
-			showCopyURLWindow: false,
 		};
 	},
 
@@ -73,16 +69,16 @@ var Application = React.createClass({
 							onChange={evt => this.setState({
 		            videoURL: evt.target.value
 							})}
-							onKeyDown={evt => this._add(evt)}
+							
 							value={this.state.videoURL}
 						>  </input>
 						<span
 							style={style}
 							onClick={() => {
-							  ROOM_ID = Math.floor(Math.random() * UNIVERSE);;
-							  Arbiter.publish("video/load", {url: this.state.videoURL, roomID: ROOM_ID});
+							  //ROOM_ID = Math.floor(Math.random() * UNIVERSE);;
+							  Arbiter.publish("video/load", {url: this.state.videoURL});
 							  //this.state.showCopyURLWindow = true;
-							  this.setState({showCopyURLWindow: true});
+							  //this.setState({showCopyURLWindow: true});
 							}}
 							onMouseDown={() => {
 								this.setState({isButtonDown: true});
@@ -91,11 +87,7 @@ var Application = React.createClass({
 							<Icon
 								style={styles.icon}
 								icon='add-circle'
-							/>
-							{
-								this._copyURLWindow()
-							}
-							
+							/>							
 						</span>
 					</span>
 					<span style={styles.loginSection}>
@@ -166,22 +158,6 @@ var Application = React.createClass({
 					<ModalDialog
 						onClose={() => {}}>
 						{accountWindow}
-					</ModalDialog>
-				</ModalContainer>
-			) : null;
-	},
-
-	_copyURLWindow(): any {
-		
-		return this.state.showCopyURLWindow
-			? (
-				<ModalContainer
-					onClose={() => this.setState({showCopyURLWindow: false})}>
-					<ModalDialog
-						onClose={() => {}}>
-						{<div style={styles.dialogContainer}> 
-							<h3>Please share the URL http://da165706.ngrok.io/{ROOM_ID}	to watch together with friends.</h3>
-						</div>}
 					</ModalDialog>
 				</ModalContainer>
 			) : null;
