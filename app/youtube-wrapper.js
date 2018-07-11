@@ -12,7 +12,10 @@ var http = require('http');
 var UNIVERSE = 100000;
 var rid = Math.floor(Math.random() * UNIVERSE);
 //var socket = io.connect('http://localhost:8989');
-
+var serverIP = 'localhost';
+var port = '8989';
+var io = require('socket.io-client');
+var socket = io.connect('http://' + serverIP + ':' + port);
 require('./style.css');
 
 var YoutubePlayerWrapper = React.createClass({
@@ -53,11 +56,12 @@ var YoutubePlayer = React.createClass({
             height: 390,
             width: 640
         };
-    },   
+    },
 
     getInitialState: function() {
         //socket.on('notification', this.messageRecieve);
-
+        socket.emit('create', 'room1');
+        socket.on('notification', this.messageRecieve);
         return {
             'playerProgress': 0,
             'playerState': PlayerState.UNSTARTED
@@ -70,7 +74,7 @@ var YoutubePlayer = React.createClass({
             return;
         }
         console.error(data);
-        
+
         switch(data.msgType) {
         case msg.MsgType.CHECK_LATENCY:
             notifyServer(createMessage(true, rid));
@@ -79,7 +83,7 @@ var YoutubePlayer = React.createClass({
             this.applyActionToPlayer(data, this.state.player);
             break;
         }
-        
+
         return;
     },
 
@@ -99,11 +103,11 @@ var YoutubePlayer = React.createClass({
     },
 
     /*update: function() {
-        // TODO(shen) 
+        // TODO(shen)
         // 0. get the youtube_player div or iframe, and get its parent's div
         var player_div = Dom('#youtube_player');
         if (!player_div) {
-            return; 
+            return;
         }
 
         var parent_div = player_div.parent();
@@ -130,22 +134,23 @@ var YoutubePlayer = React.createClass({
      // 1. make sure the iframe's size is correct. set its width and height, make sure its parent has the same width and height
      // 2. update its top and left according to the position of its parent
     },*/
-    
+
     render: function() {
         var progress = 0;
         if (this.state) {
             progress = this.state.playerProgress;
             //console.error(progress);
         }
-
+        var w = window.innerWidth;
+        var h = window.innerHeight;
         //this.update();
 
         return (
             <div>
-            <h1> hello world youtube  </h1>
             <div ref='parent' className="container">
-            <div id='youtube_player'> </div>
+            <div id='youtube_player' style={{'width': w, 'height': h}}> </div>
             <div id="player_control" className={this.state.opaque ? 'opaque' : ''}
+            style={{'width': w, 'height': 10}}
             onClick={this.onPlayerControlClick}
             onMouseOver={this.onMouseOver}
             onMouseOut={this.onMouseOut}
@@ -162,7 +167,7 @@ var YoutubePlayer = React.createClass({
         if (player) {
             var time = percent * player.getDuration() / 100
             player.seekTo(time);
-            message = this.createMessage(false, rid, time, PlayerAction.SEEK); 
+            message = this.createMessage(false, rid, time, PlayerAction.SEEK);
             this.notifyServer(message);
         }
         this.setState({
@@ -173,7 +178,7 @@ var YoutubePlayer = React.createClass({
     onMouseOut: function() {
         this.setState({
             opaque:false
-        });                
+        });
     },
 
     onMouseOver: function(evt, varv) {
@@ -207,44 +212,44 @@ var YoutubePlayer = React.createClass({
         case PlayerState.PAUSED:
             this.state.playerState = PlayerState.PLAYING;
             this.state.player.playVideo();
-            message = this.createMessage(false, rid, this.state.player.getCurrentTime(), PlayerAction.PLAY); 
+            message = this.createMessage(false, rid, this.state.player.getCurrentTime(), PlayerAction.PLAY);
             break;
         default:
             this.state.playerState = PlayerState.PAUSED;
             this.state.player.pauseVideo();
-            message = this.createMessage(false, rid, this.state.player.getCurrentTime(), PlayerAction.PAUSE); 
+            message = this.createMessage(false, rid, this.state.player.getCurrentTime(), PlayerAction.PAUSE);
             break;
         }
-        
+
         this.notifyServer(message);
     },
 
     postData:function(data) {
         // Build the post string from an object
-        var post_data = JSON.stringify(data);
 
+        socket.emit('postData', JSON.stringify(data));
           // An object of options to indicate where to post to
-        var post_options = {
-            host: 'localhost',
-            port: '8989',
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': post_data.length
-            }
-        };
-
-            // Set up the request
-        var post_req = http.request(post_options, function(res) {
-            //res.setEncoding('utf8');
-            res.on('data', function (chunk) {
-            console.log('Response: ' + chunk);
-            });
-        });
-
-        // post the data
-        post_req.write(post_data);
-        post_req.end();
+        // var post_options = {
+        //     host: 'localhost',
+        //     port: '8989',
+        //     method: 'POST',
+        //     headers: {
+        //     'Content-Type': 'application/x-www-form-urlencoded',
+        //     'Content-Length': post_data.length
+        //     }
+        // };
+        //
+        //     // Set up the request
+        // var post_req = http.request(post_options, function(res) {
+        //     //res.setEncoding('utf8');
+        //     res.on('data', function (chunk) {
+        //     console.log('Response: ' + chunk);
+        //     });
+        // });
+        //
+        // // post the data
+        // post_req.write(post_data);
+        // post_req.end();
 
     },
   /*handleCommentSubmit: function(comment) {
@@ -263,7 +268,7 @@ var YoutubePlayer = React.createClass({
   },*/
     notifyServer: function (msg) {
         /*var msg_str = '';
-        var i = 0; 
+        var i = 0;
         for (var key in msg) {
             msg_str += (i++) ? '&' : '?';
             msg_str += key + '=' + msg[key];
@@ -272,7 +277,7 @@ var YoutubePlayer = React.createClass({
         console.error(msg);
         //this.handleCommentSubmit(msg_str);
         this.postData(msg);
-        //$.post('http://localhost:8989/' + msg_str, 
+        //$.post('http://localhost:8989/' + msg_str,
                 //function(a) {});
         /*request.post(
           'http://localhost:8989/',
@@ -302,9 +307,9 @@ var YoutubePlayer = React.createClass({
         }
         this.interval = setInterval(this.tick, 1000);
     },
-  
+
     onPlayerStateChange: function() {
-        //message = this.createMessage(false, rid, PlayerState.PLAYING); 
+        //message = this.createMessage(false, rid, PlayerState.PLAYING);
         //this.notifyServer(message);
     },
 });
@@ -319,5 +324,3 @@ youtube.init(function() {
 });
 
 module.exports = YoutubePlayerWrapper;
-
-

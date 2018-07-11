@@ -44,13 +44,15 @@ io.on('connection', function(socket){
         console.log('socket joining ' + room);
     });
     socket.on('postData', function (data) {
-        console.error('received message ' + data);
+
         var data = JSON.parse(data);
+        console.error('received message ' + data);
         // Too much POST data, kill the connection!
         if (data.length > 1e6)
             request.connection.destroy();
         var msgType = data.msgType;
         // if the message is to request
+        console.error(data["clientTime"]);
         if (msgType == msg.MsgType.REQUEST) {
             data.msgType = msg.MsgType.ACTION;
             sendMessage(data, socket.room);
@@ -58,7 +60,7 @@ io.on('connection', function(socket){
         // ack latency check
         else if (msgType == msg.MsgType.ACK) {
             latency[data.clientId] = (Date.now()-data.timestamp)/2;
-        }        
+        }
     });
     socket.on('disconnect', function(){
         console.log('socket leaving ' + socket.room);
@@ -73,4 +75,3 @@ setInterval(function checkLatency() {
     };
  //   sendMessage(message);
 }, 300000);
-
